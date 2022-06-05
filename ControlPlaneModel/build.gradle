@@ -1,0 +1,30 @@
+buildscript {
+    dependencies {
+        classpath 'software.amazon.smithy:smithy-openapi:1.7.0'
+        classpath 'software.amazon.smithy:smithy-aws-apigateway-openapi:1.7.0'
+        // The openapi plugin configured in the smithy-build.json example below
+        // uses the restJson1 protocol defined in the aws-traits package. This
+        // additional dependency must added to use that protocol.
+        classpath 'software.amazon.smithy:smithy-aws-traits:1.7.0'
+        classpath 'software.amazon.smithy:smithy-aws-apigateway-traits:1.7.0'
+        classpath 'software.amazon.smithy:smithy-aws-cloudformation:1.7.0'
+
+    }
+}
+
+plugins {
+    id 'software.amazon.smithy' version '0.5.0'
+}
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // The dependency for restJson1 is required here too.
+    implementation 'software.amazon.smithy:smithy-aws-traits:1.7.0'
+    implementation 'software.amazon.smithy:smithy-aws-apigateway-traits:1.7.0'
+    implementation 'software.amazon.smithy:smithy-aws-cloudformation:1.7.0'
+}
