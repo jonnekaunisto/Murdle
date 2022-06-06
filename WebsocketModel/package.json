@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build-nats": "ag model.yaml @asyncapi/ts-nats-template -o output-nats --param \"promisifyReplyCallback=true\"  --force-write",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@asyncapi/generator": "^1.9.5"
+  }
+}
