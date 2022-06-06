@@ -1,0 +1,6 @@
+.gradle
+build
+
+*.js
+*.d.ts
+*.js.map

@@ -1,0 +1,22 @@
+plugins {
+  id 'org.hidetake.swagger.generator' version '2.18.2'
+}
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  swaggerCodegen 'org.openapitools:openapi-generator-cli:5.2.1'     // or OpenAPI Generator
+}
+
+swaggerSources {
+  PutFormClient {
+    inputFile = file('../ControlPlaneModel/build/smithyprojections/ControlPlaneModel/source/openapi/MurdleControlPlane.openapi.json')
+    code {
+      language = 'typescript'
+      outputDir = file('lib')
+      configFile = file('./options.json')
+    }
+  }
+}

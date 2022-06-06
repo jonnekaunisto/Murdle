@@ -1,0 +1,3 @@
+includeBuild('../ControlPlaneModel')
+
+rootProject.name = 'MurdleTypescriptClient'

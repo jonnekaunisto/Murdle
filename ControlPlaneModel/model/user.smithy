@@ -1,5 +1,12 @@
 namespace com.jonnekaunisto.murdle
 
+structure PublicUser {
+    @required
+    userId: String,
+    @required
+    userName: String
+}
+
 structure UserStructure {
     @required
     userId: String,
@@ -10,6 +17,7 @@ structure UserStructure {
 }
 
 // Create
+@auth([])
 @http(uri: "/v1/user", method: "POST", code: 200)
 operation CreateUser {
     input: CreateUserInput,
