@@ -21,6 +21,7 @@ export class GameStructure {
     'players': Array<PublicUser>;
     'totalRounds': number;
     'rounds': Array<Round>;
+    'lobbyId': string;
 
     static readonly discriminator: string | undefined = undefined;
 
@@ -53,6 +54,12 @@ export class GameStructure {
             "name": "rounds",
             "baseName": "rounds",
             "type": "Array<Round>",
+            "format": ""
+        },
+        {
+            "name": "lobbyId",
+            "baseName": "lobbyId",
+            "type": "string",
             "format": ""
         }    ];
 

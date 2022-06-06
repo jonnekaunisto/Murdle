@@ -11,7 +11,7 @@ dependencies {
 }
 
 swaggerSources {
-  PutFormClient {
+  MurdleClient {
     inputFile = file('../ControlPlaneModel/build/smithyprojections/ControlPlaneModel/source/openapi/MurdleControlPlane.openapi.json')
     code {
       language = 'typescript'

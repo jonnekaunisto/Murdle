@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "target": "ES2017",
+        "strict": true,
+        "outDir": "./dist",
+        "moduleResolution": "node",
+        "removeComments": true,
+        "sourceMap": true,
+        "noLib": false,
+        "declaration": true,
+        "lib": ["dom", "es6", "es5", "dom.iterable", "scripthost"],
+        "esModuleInterop": true
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": ["./lib", "./test"]
+}

@@ -28,7 +28,9 @@ structure GameStructure {
     @required
     totalRounds: Integer,
     @required
-    rounds: RoundsList
+    rounds: RoundsList,
+    @required
+    lobbyId: String,
 }
 
 // Create
