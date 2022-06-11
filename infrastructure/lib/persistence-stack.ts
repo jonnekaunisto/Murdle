@@ -20,7 +20,7 @@ export class PersistenceStack extends Stack {
     this.usersTable = new Table(this, 'UsersTable', {
       tableName: 'MurdleUsers',
       partitionKey: {
-        name: 'OwnerId',
+        name: 'UserId',
         type: AttributeType.STRING,
       },
       billingMode: BillingMode.PAY_PER_REQUEST,

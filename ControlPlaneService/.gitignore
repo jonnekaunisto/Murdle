@@ -1,0 +1,7 @@
+node_modules
+coverage
+.parcel-cache
+
+*.d.ts
+*.js.map
+dist

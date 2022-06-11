@@ -54,5 +54,5 @@ structure UpdateUserInput {
 
 structure UpdateUserOutput {
     @required
-    user: UserStructure
+    user: PublicUser
 }
