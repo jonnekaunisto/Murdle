@@ -52,8 +52,8 @@ export function createApp(usersController: UsersController): any {
   });
 
   // Update
-  app.post('/v1/user/:userId', (req: Request<{ formName: string }, {}, UpdateUserRequestContent>, res: Response<UpdateUserResponseContent>, next) => {
-    usersController.updateForm(req.params.formName, req.body, res).catch(next);
+  app.post('/v1/user/:userId', (req: Request<{ userId: string }, {}, UpdateUserRequestContent>, res: Response<UpdateUserResponseContent>, next) => {
+    usersController.updateUser(req.params.userId, req.body, res).catch(next);
   });
 
   app.use(function (err, req, res: Response, next) {

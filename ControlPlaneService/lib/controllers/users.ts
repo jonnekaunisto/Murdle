@@ -19,7 +19,7 @@ export class UsersController {
     });
   }
 
-  public async updateForm(userId: string, body: UpdateUserRequestContent, res: Response<UpdateUserResponseContent>) {
+  public async updateUser(userId: string, body: UpdateUserRequestContent, res: Response<UpdateUserResponseContent>) {
     const userItem = await this.usersDAL.updateUser({
       userId,
       userName: body.userName,
@@ -32,9 +32,7 @@ export class UsersController {
       user: {
         userId: userItem.UserId,
         userName: userItem.UserName,
-        userToken: userItem.AuthToken,
       }
     });
   }
-
 }

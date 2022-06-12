@@ -10,11 +10,11 @@
  * Do not edit the class manually.
  */
 
-import { UserStructure } from './UserStructure';
+import { PublicUser } from './PublicUser';
 import { HttpFile } from '../http/http';
 
 export class UpdateUserResponseContent {
-    'user': UserStructure;
+    'user': PublicUser;
 
     static readonly discriminator: string | undefined = undefined;
 
@@ -22,7 +22,7 @@ export class UpdateUserResponseContent {
         {
             "name": "user",
             "baseName": "user",
-            "type": "UserStructure",
+            "type": "PublicUser",
             "format": ""
         }    ];
 

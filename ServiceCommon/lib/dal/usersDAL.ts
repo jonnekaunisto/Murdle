@@ -19,6 +19,7 @@ export class UsersDAL {
 
   public async createUser(options: CreateUserOptions): Promise<UserItem> {
     const userId = uuidv4();
+    // TODO: Ideally we'd has the auth token
     const userAuthToken = uuidv4();
     const currentUnixTime = new Date().getTime();
 
