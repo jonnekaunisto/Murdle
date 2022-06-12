@@ -31,12 +31,12 @@ export interface ErrorResponse {
   message: string,
 }
 
-export interface PutFormClients {
+export interface MurdleClients {
   usersDAL: UsersDAL;
   handler: any;
 }
 
-export function createClients(): PutFormClients {
+export function createClients(): MurdleClients {
   const ddbDocClient = DynamoDBDocument.from(
     new DynamoDBClient({
       endpoint: 'http://localhost:8000',

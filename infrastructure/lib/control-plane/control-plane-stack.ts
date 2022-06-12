@@ -7,15 +7,13 @@ import { CfnAlias } from "aws-cdk-lib/aws-kms";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { ARecord, HostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
 import { ApiGatewayDomain } from "aws-cdk-lib/aws-route53-targets";
-import { ServiceStage } from "../pipeline/service-deployment-stage";
 import { Construct } from 'constructs';
 import { readFileSync } from "fs";
-
+import { CertificateValidation, DnsValidatedCertificate } from "aws-cdk-lib/aws-certificatemanager";
 
 export interface ControlPlaneAPIStackProps {
   usersTable: Table,
   hostedZone: HostedZone,
-  domain: ServiceStage,
 }
 
 export class ControlPlaneStack extends Stack {
@@ -30,12 +28,12 @@ export class ControlPlaneStack extends Stack {
       functionName: 'MurdleControlPlaneLambda',
       memorySize: 512,
     });
-    (apiFunction.node.defaultChild as CfnFunction).overrideLogicalId('MurdleControlPlaneLambda');
+    (apiFunction.node.defaultChild as CfnFunction).overrideLogicalId('ControlPlaneLambda');
 
     props.usersTable.grantReadWriteData(apiFunction);
 
     const alias = apiFunction.latestVersion.addAlias('live');
-    (alias.node.defaultChild as CfnAlias).overrideLogicalId('MurdleControlPlaneLambdaAlias');
+    (alias.node.defaultChild as CfnAlias).overrideLogicalId('ControlPlaneLambdaAlias');
 
     const def: JSON = getOpenApiFile();
     this.api = new SpecRestApi(this, 'MurdleControlPlaneAPI', {
@@ -49,8 +47,6 @@ export class ControlPlaneStack extends Stack {
      sourceArn: this.api.arnForExecuteApi(),
     });
 
-    /*
-    TODO: Get the domain
     const apiDomainName = `cp.api.${props.hostedZone.zoneName}`;
     const certificate = new DnsValidatedCertificate(this, 'CPApiCertificate', {
       domainName: apiDomainName,
@@ -69,7 +65,6 @@ export class ControlPlaneStack extends Stack {
       target: RecordTarget.fromAlias(new ApiGatewayDomain(domain)),
       recordName: 'cp.api',
     });
-    */
   }
 }
 
