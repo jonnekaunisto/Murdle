@@ -1,6 +1,7 @@
 import { Stage, StageProps } from "aws-cdk-lib";
 import { Construct } from 'constructs';
 import { ControlPlaneStack } from "../control-plane/control-plane-stack";
+import { WebsiteStack } from "../frontend/website-stack";
 import { PersistenceStack } from "../persistence-stack";
 
 export type ServiceStage = 'alpha' | 'prod';
@@ -21,6 +22,10 @@ export class ServiceDeploymentStage extends Stage {
     new ControlPlaneStack(this, 'MurdleControlPlane', {
       usersTable: persistenceStack.usersTable,
       hostedZone: persistenceStack.hostedZone,
-    })
+    });
+
+    new WebsiteStack(this, 'MurdleWebsite', {
+      hostedZone: persistenceStack.hostedZone,
+    });
   }
 }
