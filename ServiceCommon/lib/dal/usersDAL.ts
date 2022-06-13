@@ -15,7 +15,7 @@ export interface UpdateUserOptions {
 export class UsersDAL {
   private static readonly USERS_TABLE_NAME: string = "MurdleUsers";
 
-  public constructor( private readonly ddbDocClient: DynamoDBDocument) {}
+  public constructor(private readonly ddbDocClient: DynamoDBDocument) {}
 
   public async createUser(options: CreateUserOptions): Promise<UserItem> {
     const userId = uuidv4();
