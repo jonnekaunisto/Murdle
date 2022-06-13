@@ -7,12 +7,14 @@ import {ApiException} from './exception';
 import {isCodeInRange} from '../util';
 
 import { AccessDeniedExceptionResponseContent } from '../models/AccessDeniedExceptionResponseContent';
+import { AdminRemoveFromLobbyResponseContent } from '../models/AdminRemoveFromLobbyResponseContent';
 import { CreateLobbyResponseContent } from '../models/CreateLobbyResponseContent';
 import { CreateUserRequestContent } from '../models/CreateUserRequestContent';
 import { CreateUserResponseContent } from '../models/CreateUserResponseContent';
 import { DescribeGameResponseContent } from '../models/DescribeGameResponseContent';
 import { InternalServerErrorResponseContent } from '../models/InternalServerErrorResponseContent';
 import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
+import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { ResourceNotFoundExceptionResponseContent } from '../models/ResourceNotFoundExceptionResponseContent';
 import { StartGameResponseContent } from '../models/StartGameResponseContent';
 import { SubmitGameGuessRequestContent } from '../models/SubmitGameGuessRequestContent';
@@ -25,6 +27,53 @@ import { ValidationExceptionResponseContent } from '../models/ValidationExceptio
  * no description
  */
 export class DefaultApiRequestFactory extends BaseAPIRequestFactory {
+
+    /**
+     * @param lobbyId 
+     * @param userId 
+     */
+    public async adminRemoveFromLobby(lobbyId: string, userId: string, _options?: Configuration): Promise<RequestContext> {
+        let _config = _options || this.configuration;
+
+        // verify required parameter 'lobbyId' is not null or undefined
+        if (lobbyId === null || lobbyId === undefined) {
+            throw new RequiredError('Required parameter lobbyId was null or undefined when calling adminRemoveFromLobby.');
+        }
+
+
+        // verify required parameter 'userId' is not null or undefined
+        if (userId === null || userId === undefined) {
+            throw new RequiredError('Required parameter userId was null or undefined when calling adminRemoveFromLobby.');
+        }
+
+
+        // Path Params
+        const localVarPath = '/v1/admin/lobby/{lobbyId}/user/{userId}'
+            .replace('{' + 'lobbyId' + '}', encodeURIComponent(String(lobbyId)))
+            .replace('{' + 'userId' + '}', encodeURIComponent(String(userId)));
+
+        // Make Request Context
+        const requestContext = _config.baseServer.makeRequestContext(localVarPath, HttpMethod.DELETE);
+        requestContext.setHeaderParam("Accept", "application/json, */*;q=0.8")
+
+        // Query Params
+
+        // Header Params
+
+        // Form Params
+
+
+        // Body Params
+
+        let authMethod = null;
+        // Apply auth methods
+        authMethod = _config.authMethods["smithy.api.httpApiKeyAuth"]
+        if (authMethod) {
+            await authMethod.applySecurityAuthentication(requestContext);
+        }
+
+        return requestContext;
+    }
 
     /**
      */
@@ -156,6 +205,45 @@ export class DefaultApiRequestFactory extends BaseAPIRequestFactory {
 
         // Make Request Context
         const requestContext = _config.baseServer.makeRequestContext(localVarPath, HttpMethod.POST);
+        requestContext.setHeaderParam("Accept", "application/json, */*;q=0.8")
+
+        // Query Params
+
+        // Header Params
+
+        // Form Params
+
+
+        // Body Params
+
+        let authMethod = null;
+        // Apply auth methods
+        authMethod = _config.authMethods["smithy.api.httpApiKeyAuth"]
+        if (authMethod) {
+            await authMethod.applySecurityAuthentication(requestContext);
+        }
+
+        return requestContext;
+    }
+
+    /**
+     * @param lobbyId 
+     */
+    public async leaveLobby(lobbyId: string, _options?: Configuration): Promise<RequestContext> {
+        let _config = _options || this.configuration;
+
+        // verify required parameter 'lobbyId' is not null or undefined
+        if (lobbyId === null || lobbyId === undefined) {
+            throw new RequiredError('Required parameter lobbyId was null or undefined when calling leaveLobby.');
+        }
+
+
+        // Path Params
+        const localVarPath = '/v1/lobby/{lobbyId}'
+            .replace('{' + 'lobbyId' + '}', encodeURIComponent(String(lobbyId)));
+
+        // Make Request Context
+        const requestContext = _config.baseServer.makeRequestContext(localVarPath, HttpMethod.DELETE);
         requestContext.setHeaderParam("Accept", "application/json, */*;q=0.8")
 
         // Query Params
@@ -321,6 +409,64 @@ export class DefaultApiRequestFactory extends BaseAPIRequestFactory {
 }
 
 export class DefaultApiResponseProcessor {
+
+    /**
+     * Unwraps the actual response sent by the server from the response context and deserializes the response content
+     * to the expected objects
+     *
+     * @params response Response returned by the server for a request to adminRemoveFromLobby
+     * @throws ApiException if the response code was not in [200, 299]
+     */
+     public async adminRemoveFromLobby(response: ResponseContext): Promise<AdminRemoveFromLobbyResponseContent > {
+        const contentType = ObjectSerializer.normalizeMediaType(response.headers["content-type"]);
+        if (isCodeInRange("200", response.httpStatusCode)) {
+            const body: AdminRemoveFromLobbyResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "AdminRemoveFromLobbyResponseContent", ""
+            ) as AdminRemoveFromLobbyResponseContent;
+            return body;
+        }
+        if (isCodeInRange("400", response.httpStatusCode)) {
+            const body: ValidationExceptionResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "ValidationExceptionResponseContent", ""
+            ) as ValidationExceptionResponseContent;
+            throw new ApiException<ValidationExceptionResponseContent>(400, body);
+        }
+        if (isCodeInRange("403", response.httpStatusCode)) {
+            const body: AccessDeniedExceptionResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "AccessDeniedExceptionResponseContent", ""
+            ) as AccessDeniedExceptionResponseContent;
+            throw new ApiException<AccessDeniedExceptionResponseContent>(403, body);
+        }
+        if (isCodeInRange("404", response.httpStatusCode)) {
+            const body: ResourceNotFoundExceptionResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "ResourceNotFoundExceptionResponseContent", ""
+            ) as ResourceNotFoundExceptionResponseContent;
+            throw new ApiException<ResourceNotFoundExceptionResponseContent>(404, body);
+        }
+        if (isCodeInRange("500", response.httpStatusCode)) {
+            const body: InternalServerErrorResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "InternalServerErrorResponseContent", ""
+            ) as InternalServerErrorResponseContent;
+            throw new ApiException<InternalServerErrorResponseContent>(500, body);
+        }
+
+        // Work around for missing responses in specification, e.g. for petstore.yaml
+        if (response.httpStatusCode >= 200 && response.httpStatusCode <= 299) {
+            const body: AdminRemoveFromLobbyResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "AdminRemoveFromLobbyResponseContent", ""
+            ) as AdminRemoveFromLobbyResponseContent;
+            return body;
+        }
+
+        let body = response.body || "";
+        throw new ApiException<string>(response.httpStatusCode, "Unknown API Status Code!\nBody: \"" + body + "\"");
+    }
 
     /**
      * Unwraps the actual response sent by the server from the response context and deserializes the response content
@@ -519,6 +665,64 @@ export class DefaultApiResponseProcessor {
                 ObjectSerializer.parse(await response.body.text(), contentType),
                 "JoinLobbyResponseContent", ""
             ) as JoinLobbyResponseContent;
+            return body;
+        }
+
+        let body = response.body || "";
+        throw new ApiException<string>(response.httpStatusCode, "Unknown API Status Code!\nBody: \"" + body + "\"");
+    }
+
+    /**
+     * Unwraps the actual response sent by the server from the response context and deserializes the response content
+     * to the expected objects
+     *
+     * @params response Response returned by the server for a request to leaveLobby
+     * @throws ApiException if the response code was not in [200, 299]
+     */
+     public async leaveLobby(response: ResponseContext): Promise<LeaveLobbyResponseContent > {
+        const contentType = ObjectSerializer.normalizeMediaType(response.headers["content-type"]);
+        if (isCodeInRange("200", response.httpStatusCode)) {
+            const body: LeaveLobbyResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "LeaveLobbyResponseContent", ""
+            ) as LeaveLobbyResponseContent;
+            return body;
+        }
+        if (isCodeInRange("400", response.httpStatusCode)) {
+            const body: ValidationExceptionResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "ValidationExceptionResponseContent", ""
+            ) as ValidationExceptionResponseContent;
+            throw new ApiException<ValidationExceptionResponseContent>(400, body);
+        }
+        if (isCodeInRange("403", response.httpStatusCode)) {
+            const body: AccessDeniedExceptionResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "AccessDeniedExceptionResponseContent", ""
+            ) as AccessDeniedExceptionResponseContent;
+            throw new ApiException<AccessDeniedExceptionResponseContent>(403, body);
+        }
+        if (isCodeInRange("404", response.httpStatusCode)) {
+            const body: ResourceNotFoundExceptionResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "ResourceNotFoundExceptionResponseContent", ""
+            ) as ResourceNotFoundExceptionResponseContent;
+            throw new ApiException<ResourceNotFoundExceptionResponseContent>(404, body);
+        }
+        if (isCodeInRange("500", response.httpStatusCode)) {
+            const body: InternalServerErrorResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "InternalServerErrorResponseContent", ""
+            ) as InternalServerErrorResponseContent;
+            throw new ApiException<InternalServerErrorResponseContent>(500, body);
+        }
+
+        // Work around for missing responses in specification, e.g. for petstore.yaml
+        if (response.httpStatusCode >= 200 && response.httpStatusCode <= 299) {
+            const body: LeaveLobbyResponseContent = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "LeaveLobbyResponseContent", ""
+            ) as LeaveLobbyResponseContent;
             return body;
         }
 

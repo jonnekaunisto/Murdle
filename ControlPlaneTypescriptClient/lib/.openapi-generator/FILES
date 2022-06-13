@@ -15,6 +15,7 @@ http/isomorphic-fetch.ts
 index.ts
 middleware.ts
 models/AccessDeniedExceptionResponseContent.ts
+models/AdminRemoveFromLobbyResponseContent.ts
 models/CreateLobbyResponseContent.ts
 models/CreateUserRequestContent.ts
 models/CreateUserResponseContent.ts
@@ -23,6 +24,7 @@ models/GameRoundPlayerState.ts
 models/GameStructure.ts
 models/InternalServerErrorResponseContent.ts
 models/JoinLobbyResponseContent.ts
+models/LeaveLobbyResponseContent.ts
 models/LobbyStructure.ts
 models/ObjectSerializer.ts
 models/PlayerRoundStatus.ts

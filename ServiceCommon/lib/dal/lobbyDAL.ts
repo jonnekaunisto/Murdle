@@ -1,6 +1,5 @@
 import { DynamoDBDocument, GetCommandOutput } from "@aws-sdk/lib-dynamodb";
-import { UsersDAL } from "..";
-import { LobbyItem, PublicUser, UserItem } from "../model/items";
+import { LobbyItem, PublicUser } from "../model/items";
 
 export interface CreateLobbyOptions {
   lobbyId: string,

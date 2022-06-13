@@ -3,6 +3,7 @@ import * as models from '../models/all';
 import { Configuration} from '../configuration'
 
 import { AccessDeniedExceptionResponseContent } from '../models/AccessDeniedExceptionResponseContent';
+import { AdminRemoveFromLobbyResponseContent } from '../models/AdminRemoveFromLobbyResponseContent';
 import { CreateLobbyResponseContent } from '../models/CreateLobbyResponseContent';
 import { CreateUserRequestContent } from '../models/CreateUserRequestContent';
 import { CreateUserResponseContent } from '../models/CreateUserResponseContent';
@@ -11,6 +12,7 @@ import { GameRoundPlayerState } from '../models/GameRoundPlayerState';
 import { GameStructure } from '../models/GameStructure';
 import { InternalServerErrorResponseContent } from '../models/InternalServerErrorResponseContent';
 import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
+import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { LobbyStructure } from '../models/LobbyStructure';
 import { PlayerRoundStatus } from '../models/PlayerRoundStatus';
 import { PublicUser } from '../models/PublicUser';
@@ -37,6 +39,16 @@ export class PromiseCORSApi {
         responseProcessor?: CORSApiResponseProcessor
     ) {
         this.api = new ObservableCORSApi(configuration, requestFactory, responseProcessor);
+    }
+
+    /**
+     * Handles CORS-preflight requests
+     * @param lobbyId 
+     * @param userId 
+     */
+    public corsV1AdminLobbyLobbyidUserUserid(lobbyId: string, userId: string, _options?: Configuration): Promise<void> {
+        const result = this.api.corsV1AdminLobbyLobbyidUserUserid(lobbyId, userId, _options);
+        return result.toPromise();
     }
 
     /**
@@ -119,6 +131,15 @@ export class PromiseDefaultApi {
     }
 
     /**
+     * @param lobbyId 
+     * @param userId 
+     */
+    public adminRemoveFromLobby(lobbyId: string, userId: string, _options?: Configuration): Promise<AdminRemoveFromLobbyResponseContent> {
+        const result = this.api.adminRemoveFromLobby(lobbyId, userId, _options);
+        return result.toPromise();
+    }
+
+    /**
      */
     public createLobby(_options?: Configuration): Promise<CreateLobbyResponseContent> {
         const result = this.api.createLobby(_options);
@@ -146,6 +167,14 @@ export class PromiseDefaultApi {
      */
     public joinLobby(lobbyId: string, _options?: Configuration): Promise<JoinLobbyResponseContent> {
         const result = this.api.joinLobby(lobbyId, _options);
+        return result.toPromise();
+    }
+
+    /**
+     * @param lobbyId 
+     */
+    public leaveLobby(lobbyId: string, _options?: Configuration): Promise<LeaveLobbyResponseContent> {
+        const result = this.api.leaveLobby(lobbyId, _options);
         return result.toPromise();
     }
 

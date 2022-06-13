@@ -4,6 +4,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**corsV1AdminLobbyLobbyidUserUserid**](CORSApi.md#corsV1AdminLobbyLobbyidUserUserid) | **OPTIONS** /v1/admin/lobby/{lobbyId}/user/{userId} | 
 [**corsV1Game**](CORSApi.md#corsV1Game) | **OPTIONS** /v1/game | 
 [**corsV1GameGameid**](CORSApi.md#corsV1GameGameid) | **OPTIONS** /v1/game/{gameId} | 
 [**corsV1GameGameidGuess**](CORSApi.md#corsV1GameGameidGuess) | **OPTIONS** /v1/game/{gameId}/guess | 
@@ -12,6 +13,63 @@ Method | HTTP request | Description
 [**corsV1User**](CORSApi.md#corsV1User) | **OPTIONS** /v1/user | 
 [**corsV1UserUserid**](CORSApi.md#corsV1UserUserid) | **OPTIONS** /v1/user/{userId} | 
 
+
+# **corsV1AdminLobbyLobbyidUserUserid**
+> void corsV1AdminLobbyLobbyidUserUserid()
+
+Handles CORS-preflight requests
+
+### Example
+
+
+```typescript
+import {  } from '';
+import * as fs from 'fs';
+
+const configuration = .createConfiguration();
+const apiInstance = new .CORSApi(configuration);
+
+let body:.CORSApiCorsV1AdminLobbyLobbyidUserUseridRequest = {
+  // string
+  lobbyId: "lobbyId_example",
+  // string
+  userId: "userId_example",
+};
+
+apiInstance.corsV1AdminLobbyLobbyidUserUserid(body).then((data:any) => {
+  console.log('API called successfully. Returned data: ' + data);
+}).catch((error:any) => console.error(error));
+```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **lobbyId** | [**string**] |  | defaults to undefined
+ **userId** | [**string**] |  | defaults to undefined
+
+
+### Return type
+
+**void**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Canned response for CORS-preflight requests |  * Access-Control-Allow-Headers -  <br>  * Access-Control-Allow-Methods -  <br>  * Access-Control-Allow-Origin -  <br>  * Access-Control-Max-Age -  <br>  |
+
+[[Back to top]](#) [[Back to API list]](README.md#documentation-for-api-endpoints) [[Back to Model list]](README.md#documentation-for-models) [[Back to README]](README.md)
 
 # **corsV1Game**
 > void corsV1Game()

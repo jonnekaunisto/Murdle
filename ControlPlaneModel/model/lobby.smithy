@@ -44,6 +44,51 @@ structure JoinLobbyOutput {
     lobby: LobbyStructure
 }
 
+// Leave
+@idempotent
+@http(uri: "/v1/lobby/{lobbyId}", method: "DELETE", code: 200)
+operation LeaveLobby {
+    input: LeaveLobbyInput,
+    output: LeaveLobbyOutput,
+    errors: [ValidationException, AccessDeniedException, ResourceNotFoundException, InternalServerError]
+}
+
+structure LeaveLobbyInput {
+    @required
+    @httpLabel
+    lobbyId: String,
+}
+
+structure LeaveLobbyOutput {
+    @required
+    lobby: LobbyStructure
+}
+
+
+// Admin Remove User From Lobby
+@idempotent
+@http(uri: "/v1/admin/lobby/{lobbyId}/user/{userId}", method: "DELETE", code: 200)
+operation AdminRemoveFromLobby {
+    input: AdminRemoveFromLobbyInput,
+    output: AdminRemoveFromLobbyOutput,
+    errors: [ValidationException, AccessDeniedException, ResourceNotFoundException, InternalServerError]
+}
+
+structure AdminRemoveFromLobbyInput {
+    @required
+    @httpLabel
+    lobbyId: String,
+
+    @required
+    @httpLabel
+    userId: String,
+}
+
+structure AdminRemoveFromLobbyOutput {
+    @required
+    lobby: LobbyStructure
+}
+
 list PlayersList {
     member: PublicUser
 }

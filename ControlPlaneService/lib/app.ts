@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import { UsersController } from './controllers/users';
-import { CreateUserRequestContent, CreateUserResponseContent, UpdateUserRequestContent, UpdateUserResponseContent } from "murdle-control-plane-client";
+import { CreateLobbyResponseContent, CreateUserRequestContent, CreateUserResponseContent, JoinLobbyResponseContent, LeaveLobbyResponseContent, UpdateUserRequestContent, UpdateUserResponseContent } from "murdle-control-plane-client";
 import { BaseException } from './exceptions';
+import { AuthController, AuthInfo } from './controllers/auth';
+import { UserItem } from 'murdle-service-common';
+import { LobbyController } from './controllers/lobby';
 const { getCurrentInvoke } = require('@vendia/serverless-express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs').__express;
@@ -10,23 +13,7 @@ const cors = require('cors');
 const compression = require('compression');
 const express = require('express');
 
-function getClaims(): { userSub: string, userEmail: string } {
-  const currentInvoke = getCurrentInvoke();
-  const authorizer = currentInvoke.event.requestContext.authorizer;
-  if (authorizer != undefined && authorizer.claims != undefined &&
-    authorizer.claims['sub'] != undefined && authorizer.claims['email'] != undefined) {
-    const userSub = authorizer.claims['sub'];
-    const userEmail = authorizer.claims['email'];
-    return {
-      userSub,
-      userEmail,
-    }
-  }
-  console.log('Could not find authorizer');
-  throw new Error('Could not find authorizer');
-}
-
-export function createApp(usersController: UsersController): any {
+export function createApp(usersController: UsersController, lobbyController: LobbyController, authController: AuthController): any {
   const app = express();
   app.set('view engine', 'ejs');
   app.engine('.ejs', ejs);
@@ -40,20 +27,47 @@ export function createApp(usersController: UsersController): any {
   // NOTE: tests can't find the views directory without this
   app.set('views', path.join(__dirname, 'views'));
 
-  app.use(function(req: Request, res, next) {
-    console.log(`Entering ${req.method} ${req.path}`)
+  app.use(function(req: Request, res: Response<{}, {hi: String}>, next) {
+    console.log(`Entering ${req.method} ${req.path}`);
+    
     next();
   });
 
-  // Users
-  // Create
+  // Create User
   app.post('/v1/user', (req: Request<{}, {}, CreateUserRequestContent>, res: Response<CreateUserResponseContent>, next) => {
     usersController.createUser(req.body, res).catch(next);
   });
 
-  // Update
-  app.post('/v1/user/:userId', (req: Request<{ userId: string }, {}, UpdateUserRequestContent>, res: Response<UpdateUserResponseContent>, next) => {
+  // Auth
+  // Has to be under create user since it is not authenticated
+  app.use(function(req: Request, res: Response<{}, AuthInfo>, next) {
+    console.log(`Entering ${req.method} ${req.path}`);
+
+    // Murdle Authentication Token
+    authController.authenticateUser(req.headers['X-User-Token']).then(userItem => {
+      res.locals.authenticatedUser = userItem;
+      next();
+    }).catch(next);    
+  });
+
+  // Update User
+  app.post('/v1/user/:userId', (req: Request<{ userId: string }, {}, UpdateUserRequestContent>, res: Response<UpdateUserResponseContent, AuthInfo>, next) => {
     usersController.updateUser(req.params.userId, req.body, res).catch(next);
+  });
+
+  // Create Lobby
+  app.post('/v1/lobby', (req: Request, res: Response<CreateLobbyResponseContent, AuthInfo>, next) => {
+    lobbyController.createLobby(res).catch(next);
+  });
+
+  // Join Lobby
+  app.post('/v1/lobby/:lobbyId', (req: Request<{ lobbyId: string }>, res: Response<JoinLobbyResponseContent, AuthInfo>, next) => {
+    lobbyController.joinLobby(req.params.lobbyId, res).catch(next);
+  });
+
+  // Leave Lobby
+  app.delete('/v1/lobby/:lobbyId', (req: Request<{ lobbyId: string }>, res: Response<LeaveLobbyResponseContent, AuthInfo>, next) => {
+    lobbyController.leaveLobby(req.params.lobbyId, res).catch(next);
   });
 
   app.use(function (err, req, res: Response, next) {

@@ -4,14 +4,76 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**adminRemoveFromLobby**](DefaultApi.md#adminRemoveFromLobby) | **DELETE** /v1/admin/lobby/{lobbyId}/user/{userId} | 
 [**createLobby**](DefaultApi.md#createLobby) | **POST** /v1/lobby | 
 [**createUser**](DefaultApi.md#createUser) | **POST** /v1/user | 
 [**describeGame**](DefaultApi.md#describeGame) | **GET** /v1/game/{gameId} | 
 [**joinLobby**](DefaultApi.md#joinLobby) | **POST** /v1/lobby/{lobbyId} | 
+[**leaveLobby**](DefaultApi.md#leaveLobby) | **DELETE** /v1/lobby/{lobbyId} | 
 [**startGame**](DefaultApi.md#startGame) | **POST** /v1/game | 
 [**submitGameGuess**](DefaultApi.md#submitGameGuess) | **POST** /v1/game/{gameId}/guess | 
 [**updateUser**](DefaultApi.md#updateUser) | **POST** /v1/user/{userId} | 
 
+
+# **adminRemoveFromLobby**
+> AdminRemoveFromLobbyResponseContent adminRemoveFromLobby()
+
+
+### Example
+
+
+```typescript
+import {  } from '';
+import * as fs from 'fs';
+
+const configuration = .createConfiguration();
+const apiInstance = new .DefaultApi(configuration);
+
+let body:.DefaultApiAdminRemoveFromLobbyRequest = {
+  // string
+  lobbyId: "lobbyId_example",
+  // string
+  userId: "userId_example",
+};
+
+apiInstance.adminRemoveFromLobby(body).then((data:any) => {
+  console.log('API called successfully. Returned data: ' + data);
+}).catch((error:any) => console.error(error));
+```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **lobbyId** | [**string**] |  | defaults to undefined
+ **userId** | [**string**] |  | defaults to undefined
+
+
+### Return type
+
+**AdminRemoveFromLobbyResponseContent**
+
+### Authorization
+
+[smithy.api.httpApiKeyAuth](README.md#smithy.api.httpApiKeyAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | AdminRemoveFromLobby 200 response |  * Access-Control-Allow-Origin -  <br>  |
+**400** | ValidationException 400 response |  * Access-Control-Allow-Origin -  <br>  |
+**403** | AccessDeniedException 403 response |  * Access-Control-Allow-Origin -  <br>  |
+**404** | ResourceNotFoundException 404 response |  * Access-Control-Allow-Origin -  <br>  |
+**500** | InternalServerError 500 response |  * Access-Control-Allow-Origin -  <br>  |
+
+[[Back to top]](#) [[Back to API list]](README.md#documentation-for-api-endpoints) [[Back to Model list]](README.md#documentation-for-models) [[Back to README]](README.md)
 
 # **createLobby**
 > CreateLobbyResponseContent createLobby()
@@ -226,6 +288,63 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | JoinLobby 200 response |  * Access-Control-Allow-Origin -  <br>  |
+**400** | ValidationException 400 response |  * Access-Control-Allow-Origin -  <br>  |
+**403** | AccessDeniedException 403 response |  * Access-Control-Allow-Origin -  <br>  |
+**404** | ResourceNotFoundException 404 response |  * Access-Control-Allow-Origin -  <br>  |
+**500** | InternalServerError 500 response |  * Access-Control-Allow-Origin -  <br>  |
+
+[[Back to top]](#) [[Back to API list]](README.md#documentation-for-api-endpoints) [[Back to Model list]](README.md#documentation-for-models) [[Back to README]](README.md)
+
+# **leaveLobby**
+> LeaveLobbyResponseContent leaveLobby()
+
+
+### Example
+
+
+```typescript
+import {  } from '';
+import * as fs from 'fs';
+
+const configuration = .createConfiguration();
+const apiInstance = new .DefaultApi(configuration);
+
+let body:.DefaultApiLeaveLobbyRequest = {
+  // string
+  lobbyId: "lobbyId_example",
+};
+
+apiInstance.leaveLobby(body).then((data:any) => {
+  console.log('API called successfully. Returned data: ' + data);
+}).catch((error:any) => console.error(error));
+```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **lobbyId** | [**string**] |  | defaults to undefined
+
+
+### Return type
+
+**LeaveLobbyResponseContent**
+
+### Authorization
+
+[smithy.api.httpApiKeyAuth](README.md#smithy.api.httpApiKeyAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | LeaveLobby 200 response |  * Access-Control-Allow-Origin -  <br>  |
 **400** | ValidationException 400 response |  * Access-Control-Allow-Origin -  <br>  |
 **403** | AccessDeniedException 403 response |  * Access-Control-Allow-Origin -  <br>  |
 **404** | ResourceNotFoundException 404 response |  * Access-Control-Allow-Origin -  <br>  |

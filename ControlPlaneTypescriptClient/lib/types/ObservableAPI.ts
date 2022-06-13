@@ -4,6 +4,7 @@ import { Configuration} from '../configuration'
 import { Observable, of, from } from '../rxjsStub';
 import {mergeMap, map} from  '../rxjsStub';
 import { AccessDeniedExceptionResponseContent } from '../models/AccessDeniedExceptionResponseContent';
+import { AdminRemoveFromLobbyResponseContent } from '../models/AdminRemoveFromLobbyResponseContent';
 import { CreateLobbyResponseContent } from '../models/CreateLobbyResponseContent';
 import { CreateUserRequestContent } from '../models/CreateUserRequestContent';
 import { CreateUserResponseContent } from '../models/CreateUserResponseContent';
@@ -12,6 +13,7 @@ import { GameRoundPlayerState } from '../models/GameRoundPlayerState';
 import { GameStructure } from '../models/GameStructure';
 import { InternalServerErrorResponseContent } from '../models/InternalServerErrorResponseContent';
 import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
+import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { LobbyStructure } from '../models/LobbyStructure';
 import { PlayerRoundStatus } from '../models/PlayerRoundStatus';
 import { PublicUser } from '../models/PublicUser';
@@ -43,6 +45,30 @@ export class ObservableCORSApi {
         this.responseProcessor = responseProcessor || new CORSApiResponseProcessor();
     }
 
+    /**
+     * Handles CORS-preflight requests
+     * @param lobbyId 
+     * @param userId 
+     */
+    public corsV1AdminLobbyLobbyidUserUserid(lobbyId: string, userId: string, _options?: Configuration): Observable<void> {
+        const requestContextPromise = this.requestFactory.corsV1AdminLobbyLobbyidUserUserid(lobbyId, userId, _options);
+
+        // build promise chain
+        let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+        for (let middleware of this.configuration.middleware) {
+            middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+        }
+
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
+            pipe(mergeMap((response: ResponseContext) => {
+                let middlewarePostObservable = of(response);
+                for (let middleware of this.configuration.middleware) {
+                    middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+                }
+                return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.corsV1AdminLobbyLobbyidUserUserid(rsp)));
+            }));
+    }
+ 
     /**
      * Handles CORS-preflight requests
      */
@@ -220,6 +246,29 @@ export class ObservableDefaultApi {
     }
 
     /**
+     * @param lobbyId 
+     * @param userId 
+     */
+    public adminRemoveFromLobby(lobbyId: string, userId: string, _options?: Configuration): Observable<AdminRemoveFromLobbyResponseContent> {
+        const requestContextPromise = this.requestFactory.adminRemoveFromLobby(lobbyId, userId, _options);
+
+        // build promise chain
+        let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+        for (let middleware of this.configuration.middleware) {
+            middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+        }
+
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
+            pipe(mergeMap((response: ResponseContext) => {
+                let middlewarePostObservable = of(response);
+                for (let middleware of this.configuration.middleware) {
+                    middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+                }
+                return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.adminRemoveFromLobby(rsp)));
+            }));
+    }
+ 
+    /**
      */
     public createLobby(_options?: Configuration): Observable<CreateLobbyResponseContent> {
         const requestContextPromise = this.requestFactory.createLobby(_options);
@@ -303,6 +352,28 @@ export class ObservableDefaultApi {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.joinLobby(rsp)));
+            }));
+    }
+ 
+    /**
+     * @param lobbyId 
+     */
+    public leaveLobby(lobbyId: string, _options?: Configuration): Observable<LeaveLobbyResponseContent> {
+        const requestContextPromise = this.requestFactory.leaveLobby(lobbyId, _options);
+
+        // build promise chain
+        let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+        for (let middleware of this.configuration.middleware) {
+            middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+        }
+
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
+            pipe(mergeMap((response: ResponseContext) => {
+                let middlewarePostObservable = of(response);
+                for (let middleware of this.configuration.middleware) {
+                    middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+                }
+                return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.leaveLobby(rsp)));
             }));
     }
  

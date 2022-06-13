@@ -3,6 +3,7 @@ import * as models from '../models/all';
 import { Configuration} from '../configuration'
 
 import { AccessDeniedExceptionResponseContent } from '../models/AccessDeniedExceptionResponseContent';
+import { AdminRemoveFromLobbyResponseContent } from '../models/AdminRemoveFromLobbyResponseContent';
 import { CreateLobbyResponseContent } from '../models/CreateLobbyResponseContent';
 import { CreateUserRequestContent } from '../models/CreateUserRequestContent';
 import { CreateUserResponseContent } from '../models/CreateUserResponseContent';
@@ -11,6 +12,7 @@ import { GameRoundPlayerState } from '../models/GameRoundPlayerState';
 import { GameStructure } from '../models/GameStructure';
 import { InternalServerErrorResponseContent } from '../models/InternalServerErrorResponseContent';
 import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
+import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { LobbyStructure } from '../models/LobbyStructure';
 import { PlayerRoundStatus } from '../models/PlayerRoundStatus';
 import { PublicUser } from '../models/PublicUser';
@@ -28,6 +30,21 @@ import { ValidationExceptionResponseContent } from '../models/ValidationExceptio
 
 import { ObservableCORSApi } from "./ObservableAPI";
 import { CORSApiRequestFactory, CORSApiResponseProcessor} from "../apis/CORSApi";
+
+export interface CORSApiCorsV1AdminLobbyLobbyidUserUseridRequest {
+    /**
+     * 
+     * @type string
+     * @memberof CORSApicorsV1AdminLobbyLobbyidUserUserid
+     */
+    lobbyId: string
+    /**
+     * 
+     * @type string
+     * @memberof CORSApicorsV1AdminLobbyLobbyidUserUserid
+     */
+    userId: string
+}
 
 export interface CORSApiCorsV1GameRequest {
 }
@@ -79,6 +96,14 @@ export class ObjectCORSApi {
 
     public constructor(configuration: Configuration, requestFactory?: CORSApiRequestFactory, responseProcessor?: CORSApiResponseProcessor) {
         this.api = new ObservableCORSApi(configuration, requestFactory, responseProcessor);
+    }
+
+    /**
+     * Handles CORS-preflight requests
+     * @param param the request object
+     */
+    public corsV1AdminLobbyLobbyidUserUserid(param: CORSApiCorsV1AdminLobbyLobbyidUserUseridRequest, options?: Configuration): Promise<void> {
+        return this.api.corsV1AdminLobbyLobbyidUserUserid(param.lobbyId, param.userId,  options).toPromise();
     }
 
     /**
@@ -142,6 +167,21 @@ export class ObjectCORSApi {
 import { ObservableDefaultApi } from "./ObservableAPI";
 import { DefaultApiRequestFactory, DefaultApiResponseProcessor} from "../apis/DefaultApi";
 
+export interface DefaultApiAdminRemoveFromLobbyRequest {
+    /**
+     * 
+     * @type string
+     * @memberof DefaultApiadminRemoveFromLobby
+     */
+    lobbyId: string
+    /**
+     * 
+     * @type string
+     * @memberof DefaultApiadminRemoveFromLobby
+     */
+    userId: string
+}
+
 export interface DefaultApiCreateLobbyRequest {
 }
 
@@ -168,6 +208,15 @@ export interface DefaultApiJoinLobbyRequest {
      * 
      * @type string
      * @memberof DefaultApijoinLobby
+     */
+    lobbyId: string
+}
+
+export interface DefaultApiLeaveLobbyRequest {
+    /**
+     * 
+     * @type string
+     * @memberof DefaultApileaveLobby
      */
     lobbyId: string
 }
@@ -215,6 +264,13 @@ export class ObjectDefaultApi {
     /**
      * @param param the request object
      */
+    public adminRemoveFromLobby(param: DefaultApiAdminRemoveFromLobbyRequest, options?: Configuration): Promise<AdminRemoveFromLobbyResponseContent> {
+        return this.api.adminRemoveFromLobby(param.lobbyId, param.userId,  options).toPromise();
+    }
+
+    /**
+     * @param param the request object
+     */
     public createLobby(param: DefaultApiCreateLobbyRequest, options?: Configuration): Promise<CreateLobbyResponseContent> {
         return this.api.createLobby( options).toPromise();
     }
@@ -238,6 +294,13 @@ export class ObjectDefaultApi {
      */
     public joinLobby(param: DefaultApiJoinLobbyRequest, options?: Configuration): Promise<JoinLobbyResponseContent> {
         return this.api.joinLobby(param.lobbyId,  options).toPromise();
+    }
+
+    /**
+     * @param param the request object
+     */
+    public leaveLobby(param: DefaultApiLeaveLobbyRequest, options?: Configuration): Promise<LeaveLobbyResponseContent> {
+        return this.api.leaveLobby(param.lobbyId,  options).toPromise();
     }
 
     /**

@@ -1,7 +1,8 @@
 import { Response } from "express";
 import { UsersDAL } from "murdle-service-common";
-import { UserNotFoundException } from "../exceptions";
+import { AccessDeniedException, UserNotFoundException } from "../exceptions";
 import { CreateUserRequestContent, CreateUserResponseContent, UpdateUserRequestContent, UpdateUserResponseContent } from "murdle-control-plane-client";
+import { AuthInfo } from "./auth";
 
 export class UsersController {
   public constructor(private readonly usersDAL: UsersDAL) {}
@@ -19,7 +20,11 @@ export class UsersController {
     });
   }
 
-  public async updateUser(userId: string, body: UpdateUserRequestContent, res: Response<UpdateUserResponseContent>) {
+  public async updateUser(userId: string, body: UpdateUserRequestContent, res: Response<UpdateUserResponseContent, AuthInfo>) {
+    if (userId != res.locals.authenticatedUser.UserId) {
+      throw new AccessDeniedException('Access Denied');
+    }
+
     const userItem = await this.usersDAL.updateUser({
       userId,
       userName: body.userName,

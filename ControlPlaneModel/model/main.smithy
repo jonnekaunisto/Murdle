@@ -18,7 +18,7 @@ service MurdleControlPlane {
         //User
         CreateUser, UpdateUser,
         //Lobby
-        CreateLobby, JoinLobby,
+        CreateLobby, JoinLobby, LeaveLobby, AdminRemoveFromLobby,
         //Game
         StartGame, DescribeGame,
         //Game Actions

@@ -1,4 +1,5 @@
 export * from './AccessDeniedExceptionResponseContent';
+export * from './AdminRemoveFromLobbyResponseContent';
 export * from './CreateLobbyResponseContent';
 export * from './CreateUserRequestContent';
 export * from './CreateUserResponseContent';
@@ -7,6 +8,7 @@ export * from './GameRoundPlayerState';
 export * from './GameStructure';
 export * from './InternalServerErrorResponseContent';
 export * from './JoinLobbyResponseContent';
+export * from './LeaveLobbyResponseContent';
 export * from './LobbyStructure';
 export * from './PlayerRoundStatus';
 export * from './PublicUser';
@@ -23,6 +25,7 @@ export * from './UserStructure';
 export * from './ValidationExceptionResponseContent';
 
 import { AccessDeniedExceptionResponseContent } from './AccessDeniedExceptionResponseContent';
+import { AdminRemoveFromLobbyResponseContent } from './AdminRemoveFromLobbyResponseContent';
 import { CreateLobbyResponseContent } from './CreateLobbyResponseContent';
 import { CreateUserRequestContent } from './CreateUserRequestContent';
 import { CreateUserResponseContent } from './CreateUserResponseContent';
@@ -31,6 +34,7 @@ import { GameRoundPlayerState } from './GameRoundPlayerState';
 import { GameStructure } from './GameStructure';
 import { InternalServerErrorResponseContent } from './InternalServerErrorResponseContent';
 import { JoinLobbyResponseContent } from './JoinLobbyResponseContent';
+import { LeaveLobbyResponseContent } from './LeaveLobbyResponseContent';
 import { LobbyStructure } from './LobbyStructure';
 import { PlayerRoundStatus } from './PlayerRoundStatus';
 import { PublicUser } from './PublicUser';
@@ -71,6 +75,7 @@ let enumsMap: Set<string> = new Set<string>([
 
 let typeMap: {[index: string]: any} = {
     "AccessDeniedExceptionResponseContent": AccessDeniedExceptionResponseContent,
+    "AdminRemoveFromLobbyResponseContent": AdminRemoveFromLobbyResponseContent,
     "CreateLobbyResponseContent": CreateLobbyResponseContent,
     "CreateUserRequestContent": CreateUserRequestContent,
     "CreateUserResponseContent": CreateUserResponseContent,
@@ -79,6 +84,7 @@ let typeMap: {[index: string]: any} = {
     "GameStructure": GameStructure,
     "InternalServerErrorResponseContent": InternalServerErrorResponseContent,
     "JoinLobbyResponseContent": JoinLobbyResponseContent,
+    "LeaveLobbyResponseContent": LeaveLobbyResponseContent,
     "LobbyStructure": LobbyStructure,
     "PublicUser": PublicUser,
     "ResourceNotFoundExceptionResponseContent": ResourceNotFoundExceptionResponseContent,
