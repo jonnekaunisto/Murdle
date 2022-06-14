@@ -1,4 +1,4 @@
-import { DefaultApi, UserStructure } from "murdle-control-plane-client";
+import { DefaultApi } from "murdle-control-plane-client";
 import { useRouter } from "next/router";
 import { SyntheticEvent, useEffect, useState } from "react";
 import { LocalUser, LocalUserDAL } from "../../util/localUserDAL";
@@ -7,6 +7,7 @@ import { createClient } from "../../util/murdleClient";
 export const LandingPage: React.FC = () => {
   const router = useRouter();
   const [userName, setUserName] = useState("");
+  const [joinLobbyId, setJoinLobbyId] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
   function upsertUser(
@@ -46,7 +47,7 @@ export const LandingPage: React.FC = () => {
     return Promise.resolve(undefined);
   }
 
-  async function onSubmit(event: SyntheticEvent) {
+  async function createLobby(event: SyntheticEvent) {
     event.preventDefault();
     const localUserDAL = new LocalUserDAL();
     const user = localUserDAL.getUser();
@@ -70,6 +71,11 @@ export const LandingPage: React.FC = () => {
       });
   }
 
+  async function joinLobby(event: SyntheticEvent) {
+    event.preventDefault();
+    router.push(`/lobby?lobbyId=${joinLobbyId}`);
+  }
+
   useEffect(function () {
     const localUserDAL = new LocalUserDAL();
     const user = localUserDAL.getUser();
@@ -79,27 +85,52 @@ export const LandingPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-slate-50 max-w-md w-full space-y-8 min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      {errorMessage && (
-        <p className="mt-2 text-center text-sm text-red-600 font-medium">
-          {" "}
-          {errorMessage}{" "}
-        </p>
-      )}
-      <form onSubmit={onSubmit}>
-        <label>
-          Name:
+    <div className="bg-slate-50 grid place-items-center h-screen">
+      <div className="bg-white p-10 rounded-md drop-shadow">
+        <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">Murdle</h1>
+        {errorMessage && (
+          <p className="mt-2 text-center text-sm text-red-600 font-medium">
+            {" "}
+            {errorMessage}{" "}
+          </p>
+        )}
+        <form onSubmit={createLobby} className="my-5">
+          <label>
+            <input
+              type="text"
+              name="name"
+              required
+              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Choose UserName"
+              value={userName}
+              onChange={(event) => setUserName(event.target.value)}
+            />
+          </label>
           <input
-            type="text"
-            name="name"
-            required
-            placeholder="Choose a Name"
-            value={userName}
-            onChange={(event) => setUserName(event.target.value)}
+            type="submit"
+            value="Create Lobby"
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           />
-        </label>
-        <input type="submit" value="Create a Lobby" />
-      </form>
+        </form>
+        <form onSubmit={joinLobby} className="my-5">
+          <label>
+            <input
+              type="text"
+              name="name"
+              required
+              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="ex. noisy.bobby.foamy"
+              value={joinLobbyId}
+              onChange={(event) => setJoinLobbyId(event.target.value)}
+            />
+          </label>
+          <input
+            type="submit"
+            value="Join Lobby"
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          />
+        </form>
+      </div>
     </div>
   );
 };
