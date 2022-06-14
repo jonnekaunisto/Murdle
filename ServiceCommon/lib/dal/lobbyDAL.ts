@@ -74,6 +74,11 @@ export class LobbyDAL {
       return undefined;
     }
 
+    const userIndex = this.findUserIndexInLobby(lobby, options.publicUser.UserId);
+    if (userIndex != undefined) {
+      return lobby;
+    }
+
     return this.ddbDocClient.update({
       TableName: LobbyDAL.LOBBY_TABLE_NAME,
       Key: {

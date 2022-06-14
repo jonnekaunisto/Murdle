@@ -69,6 +69,13 @@ describe('End to End', () => {
     testLobby.Players.push(player);
     expect(addLobby).toEqual(testLobby);
 
+    // Add Player Again, should be idempotent
+    const addLobbyAgain = await lobbyDAL.addUserToLobby({
+      lobbyId: testLobby.LobbyId,
+      publicUser: player,
+    });
+    expect(addLobbyAgain).toEqual(testLobby);
+
     // Remove Player
     const removeLobby = await lobbyDAL.removeUserFromLobby({
       lobbyId: testLobby.LobbyId,

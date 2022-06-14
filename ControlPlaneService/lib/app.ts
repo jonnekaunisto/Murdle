@@ -41,10 +41,12 @@ export function createApp(usersController: UsersController, lobbyController: Lob
   // Auth
   // Has to be under create user since it is not authenticated
   app.use(function(req: Request, res: Response<{}, AuthInfo>, next) {
-    console.log(`Entering ${req.method} ${req.path}`);
+    console.log('Entering authentication middleware');
 
     // Murdle Authentication Token
-    authController.authenticateUser(req.headers['X-User-Token']).then(userItem => {
+    authController.authenticateUser(req.get('x-user-token')).then(userItem => {
+      console.log('Authenticated User')
+      console.log(userItem.UserId);
       res.locals.authenticatedUser = userItem;
       next();
     }).catch(next);    

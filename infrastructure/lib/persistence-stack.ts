@@ -12,6 +12,7 @@ export class PersistenceStack extends Stack {
   private static readonly ROOT_DOMAIN_NAME = 'murdle.jonnekaunisto.com';
 
   public readonly usersTable: Table;
+  public readonly lobbyTable: Table;
   public readonly hostedZone: PublicHostedZone;
 
   public constructor(scope: Construct, id: string, props: PersistenceStackProps) {
@@ -31,6 +32,15 @@ export class PersistenceStack extends Stack {
         name: 'AuthToken',
         type: AttributeType.STRING,
       },
+    });
+
+    this.lobbyTable = new Table(this, 'LobbyTable', {
+      tableName: 'MurdleLobby',
+      partitionKey: {
+        name: 'LobbyId',
+        type: AttributeType.STRING,
+      },
+      billingMode: BillingMode.PAY_PER_REQUEST,
     });
 
     this.hostedZone = new PublicHostedZone(this, 'ServiceDomain', {

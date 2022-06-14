@@ -21,6 +21,7 @@ export class ServiceDeploymentStage extends Stage {
 
     new ControlPlaneStack(this, 'MurdleControlPlane', {
       usersTable: persistenceStack.usersTable,
+      lobbyTable: persistenceStack.lobbyTable,
       hostedZone: persistenceStack.hostedZone,
     });
 

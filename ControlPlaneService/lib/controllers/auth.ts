@@ -9,15 +9,18 @@ export class AuthController {
   public constructor(private readonly usersDAL: UsersDAL) {}
 
   public async authenticateUser(authToken: string | string[] | undefined): Promise<UserItem> {
-    if (typeof authToken !== 'string') {
-      throw new AccessDeniedException('Access Denied');
-    }
     if (authToken == undefined) {
-      throw new AccessDeniedException('Access Denied');
+      console.log('Auth token is undefined');
+      throw new AccessDeniedException('Access Denied: Auth Token Not Provided');
+    }
+    if (typeof authToken !== 'string') {
+      console.log('Auth token is not a string');
+      throw new AccessDeniedException('Access Denied: Auth Token Malformed');
     }
     const userItem = await this.usersDAL.getUserByAuthToken(authToken);
     if (userItem == undefined) {
-      throw new AccessDeniedException('Access Denied');
+      console.log('Auth token is not valid');
+      throw new AccessDeniedException('Access Denied: Auth Token Not Found');
     }
     return userItem;
   }

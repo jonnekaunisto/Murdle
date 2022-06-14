@@ -1,10 +1,10 @@
-import { DefaultApi, UserStructure } from "murdle-control-plane-client";
+import { DefaultApi } from "murdle-control-plane-client";
 import { useRouter } from "next/router";
 import { SyntheticEvent, useEffect, useState } from "react";
 import { LocalUser, LocalUserDAL } from "../../util/localUserDAL";
 import { createClient } from "../../util/murdleClient";
 
-export const LandingPage: React.FC = () => {
+export const JoinLobbyPage: React.FC = () => {
   const router = useRouter();
   const [userName, setUserName] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
@@ -48,21 +48,14 @@ export const LandingPage: React.FC = () => {
 
   async function onSubmit(event: SyntheticEvent) {
     event.preventDefault();
+    const parsedLobbyId = router.query.lobbyId as string;
     const localUserDAL = new LocalUserDAL();
     const user = localUserDAL.getUser();
     const murdleClient = createClient(user?.authToken);
 
     upsertUser(murdleClient, localUserDAL, user)
       .then(() => {
-        murdleClient
-          .createLobby()
-          .then((result) => {
-            router.push(`/lobby?lobbyId=${result.lobby.lobbyId}`);
-          })
-          .catch((error) => {
-            setErrorMessage("Encountered an unexpected error");
-            console.log(error);
-          });
+        router.push(`/lobby?lobbyId=${parsedLobbyId}`);
       })
       .catch((error) => {
         setErrorMessage("Encountered an unexpected error");
@@ -98,7 +91,7 @@ export const LandingPage: React.FC = () => {
             onChange={(event) => setUserName(event.target.value)}
           />
         </label>
-        <input type="submit" value="Create a Lobby" />
+        <input type="submit" value="Join Lobby" />
       </form>
     </div>
   );
