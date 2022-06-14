@@ -73,7 +73,7 @@ export const LandingPage: React.FC = () => {
 
   async function joinLobby(event: SyntheticEvent) {
     event.preventDefault();
-    router.push(`/lobby?lobbyId=${joinLobbyId}`);
+    router.push(`/join?lobbyId=${joinLobbyId}`);
   }
 
   useEffect(function () {
