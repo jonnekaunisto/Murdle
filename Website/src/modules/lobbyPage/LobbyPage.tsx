@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { LocalUser, LocalUserDAL } from "../../util/localUserDAL";
 import { createClient } from "../../util/murdleClient";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { QRCodeSVG } from "qrcode.react";
 
 interface Player {
   playerId: string;
@@ -51,13 +52,16 @@ export const LobbyPage: React.FC = () => {
       if (!router.isReady) {
         return;
       }
-      // TODO: Add better validation
+      if (typeof router.query.lobbyId !== "string") {
+        setErrorMessage("You cannot join an invalid Lobby.");
+        return;
+      }
       const parsedLobbyId = router.query.lobbyId as string;
       setLobbyId(parsedLobbyId);
       const localUserDAL = new LocalUserDAL();
       const user = localUserDAL.getUser();
       if (user == undefined) {
-        router.push(`/join?lobbyId=${parsedLobbyId}`);
+        router.push(`/join/?lobbyId=${parsedLobbyId}`);
         return;
       }
 
@@ -89,6 +93,14 @@ export const LobbyPage: React.FC = () => {
         <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">
           Murdle
         </h1>
+        <p className="text-gray-500 text-center text-base mt-5">
+          Only the Lobby Owner Can Start the Game
+        </p>
+        <input
+          type="submit"
+          value="Start Game"
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        />
         <p className="pt-5 text-gray-600 text-center text-2xl">
           Waiting for Players ({players.length}/8)
         </p>
@@ -106,10 +118,30 @@ export const LobbyPage: React.FC = () => {
           Share Code or Link with Friends:
         </p>
         <div>
-          <input type="text" value={`${lobbyId}`} className="appearance-none rounded-none relative px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" readOnly />
-          <CopyToClipboard text={`murdle.jonnekaunisto.com/join?lobbyId=${lobbyId}`} onCopy={() => setCopied(true)}>
-            <button className="group relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">{copied ? 'Copied' : 'Copy'}</button>
+          <input
+            type="text"
+            value={`${lobbyId}`}
+            className="appearance-none rounded-none relative px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+            readOnly
+          />
+          <CopyToClipboard
+            text={`murdle.jonnekaunisto.com/join/?lobbyId=${lobbyId}`}
+            onCopy={() => setCopied(true)}
+          >
+            <button className="group relative py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              {copied ? "Copied" : "Copy"}
+            </button>
           </CopyToClipboard>
+        </div>
+        <p className="pt-5 text-gray-500 text-center text-xl">
+          Or Share the QR code:
+        </p>
+        <div style={{ background: "white", padding: "16px" }}>
+          <div className="hero container max-w-screen-lg mx-auto pb-2 flex justify-center">
+            <QRCodeSVG
+              value={`murdle.jonnekaunisto.com/join/?lobbyId=${lobbyId}`}
+            />
+          </div>
         </div>
       </div>
     </div>

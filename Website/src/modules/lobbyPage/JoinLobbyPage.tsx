@@ -7,6 +7,7 @@ import { createClient } from "../../util/murdleClient";
 export const JoinLobbyPage: React.FC = () => {
   const router = useRouter();
   const [userName, setUserName] = useState("");
+  const [lobbyId, setLobbyId] = useState<string | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
   function upsertUser(
@@ -48,14 +49,17 @@ export const JoinLobbyPage: React.FC = () => {
 
   async function onSubmit(event: SyntheticEvent) {
     event.preventDefault();
-    const parsedLobbyId = router.query.lobbyId as string;
+    if (lobbyId == undefined) {
+      setErrorMessage("You cannot join an invalid Lobby.")
+      return;
+    }
     const localUserDAL = new LocalUserDAL();
     const user = localUserDAL.getUser();
     const murdleClient = createClient(user?.authToken);
 
     upsertUser(murdleClient, localUserDAL, user)
       .then(() => {
-        router.push(`/lobby?lobbyId=${parsedLobbyId}`);
+        router.push(`/lobby/?lobbyId=${lobbyId}`);
       })
       .catch((error) => {
         setErrorMessage("Encountered an unexpected error");
@@ -64,12 +68,22 @@ export const JoinLobbyPage: React.FC = () => {
   }
 
   useEffect(function () {
+    if (!router.isReady) {
+      return;
+    }
+    if (typeof router.query.lobbyId !== 'string') {
+      setErrorMessage('LobbyId is not valid.');
+    } else {
+      const parsedLobbyId = router.query.lobbyId as string;
+      setLobbyId(parsedLobbyId);
+    }
+
     const localUserDAL = new LocalUserDAL();
     const user = localUserDAL.getUser();
     if (user?.userName) {
       setUserName(user?.userName);
     }
-  }, []);
+  }, [router.isReady]);
 
   return (
     <div className="bg-slate-50 grid place-items-center h-screen">

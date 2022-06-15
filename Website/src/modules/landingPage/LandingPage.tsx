@@ -58,7 +58,7 @@ export const LandingPage: React.FC = () => {
         murdleClient
           .createLobby()
           .then((result) => {
-            router.push(`/lobby?lobbyId=${result.lobby.lobbyId}`);
+            router.push(`/lobby/?lobbyId=${result.lobby.lobbyId}`);
           })
           .catch((error) => {
             setErrorMessage("Encountered an unexpected error");
@@ -73,7 +73,7 @@ export const LandingPage: React.FC = () => {
 
   async function joinLobby(event: SyntheticEvent) {
     event.preventDefault();
-    router.push(`/join?lobbyId=${joinLobbyId}`);
+    router.push(`/join/?lobbyId=${joinLobbyId}`);
   }
 
   useEffect(function () {
