@@ -42,6 +42,7 @@ operation StartGame {
 }
 
 structure StartGameInput {
+    lobbyId: String,
 }
 
 structure StartGameOutput {

@@ -29,3 +29,26 @@ export interface LobbyItem {
    */
   CleanupTime: number,
 }
+
+// Game
+export type RoundStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'DONE';
+export interface PlayerScore {
+  Player: PublicUser,
+  Score: number,
+  TotalTime: number,
+}
+
+export interface Round {
+  StartTime: number,
+  EndTime: number,
+  Status: RoundStatus,
+  WordleWord: string,
+}
+
+export interface GameItem {
+  GameId: string,
+  PlayerScores: PlayerScore[],
+  Rounds: Round[],
+  LobbyId: string,
+  Metadata: Metadata,
+}
