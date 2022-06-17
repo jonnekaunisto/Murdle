@@ -28,11 +28,12 @@ models/LeaveLobbyResponseContent.ts
 models/LobbyStructure.ts
 models/ObjectSerializer.ts
 models/PlayerRoundStatus.ts
+models/PlayerScore.ts
 models/PublicUser.ts
 models/ResourceNotFoundExceptionResponseContent.ts
 models/Round.ts
 models/RoundStatus.ts
-models/Score.ts
+models/StartGameRequestContent.ts
 models/StartGameResponseContent.ts
 models/SubmitGameGuessRequestContent.ts
 models/SubmitGameGuessResponseContent.ts

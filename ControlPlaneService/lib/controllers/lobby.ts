@@ -4,6 +4,7 @@ import { ResourceNotFoundException } from "../exceptions";
 import { CreateLobbyResponseContent, PublicUser as ExternalPublicUser, LobbyStructure, LeaveLobbyResponseContent, JoinLobbyResponseContent } from "murdle-control-plane-client";
 import { AuthInfo } from "./auth";
 import { getWordleId } from "../util/wordle";
+import { convertUserItemToExternal } from "../util/converter";
 
 export class LobbyController {
   public constructor(private readonly lobbyDAL: LobbyDAL) {}
@@ -59,15 +60,8 @@ export class LobbyController {
   private convertLobbyItemToExternal(lobbyItem: LobbyItem): LobbyStructure {
     return {
       lobbyId: lobbyItem.LobbyId,
-      players: lobbyItem.Players.map(this.convertUserItemToExternal),
+      players: lobbyItem.Players.map(convertUserItemToExternal),
       ownerUserId: lobbyItem.OwnerUserId,
-    }
-  }
-
-  private convertUserItemToExternal(userItem: PublicUser): ExternalPublicUser {
-    return {
-      userId: userItem.UserId,
-      userName: userItem.UserName
     }
   }
 }

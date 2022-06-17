@@ -15,11 +15,12 @@ import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
 import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { LobbyStructure } from '../models/LobbyStructure';
 import { PlayerRoundStatus } from '../models/PlayerRoundStatus';
+import { PlayerScore } from '../models/PlayerScore';
 import { PublicUser } from '../models/PublicUser';
 import { ResourceNotFoundExceptionResponseContent } from '../models/ResourceNotFoundExceptionResponseContent';
 import { Round } from '../models/Round';
 import { RoundStatus } from '../models/RoundStatus';
-import { Score } from '../models/Score';
+import { StartGameRequestContent } from '../models/StartGameRequestContent';
 import { StartGameResponseContent } from '../models/StartGameResponseContent';
 import { SubmitGameGuessRequestContent } from '../models/SubmitGameGuessRequestContent';
 import { SubmitGameGuessResponseContent } from '../models/SubmitGameGuessResponseContent';
@@ -222,6 +223,12 @@ export interface DefaultApiLeaveLobbyRequest {
 }
 
 export interface DefaultApiStartGameRequest {
+    /**
+     * 
+     * @type StartGameRequestContent
+     * @memberof DefaultApistartGame
+     */
+    startGameRequestContent: StartGameRequestContent
 }
 
 export interface DefaultApiSubmitGameGuessRequest {
@@ -307,7 +314,7 @@ export class ObjectDefaultApi {
      * @param param the request object
      */
     public startGame(param: DefaultApiStartGameRequest, options?: Configuration): Promise<StartGameResponseContent> {
-        return this.api.startGame( options).toPromise();
+        return this.api.startGame(param.startGameRequestContent,  options).toPromise();
     }
 
     /**

@@ -12,35 +12,21 @@
 
 import { HttpFile } from '../http/http';
 
-export class Score {
-    'score': string;
-    'totalTime': string;
-    'userId': string;
+export class StartGameRequestContent {
+    'lobbyId': string;
 
     static readonly discriminator: string | undefined = undefined;
 
     static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
         {
-            "name": "score",
-            "baseName": "score",
-            "type": "string",
-            "format": ""
-        },
-        {
-            "name": "totalTime",
-            "baseName": "totalTime",
-            "type": "string",
-            "format": ""
-        },
-        {
-            "name": "userId",
-            "baseName": "userId",
+            "name": "lobbyId",
+            "baseName": "lobbyId",
             "type": "string",
             "format": ""
         }    ];
 
     static getAttributeTypeMap() {
-        return Score.attributeTypeMap;
+        return StartGameRequestContent.attributeTypeMap;
     }
     
     public constructor() {

@@ -16,6 +16,7 @@ import { InternalServerErrorResponseContent } from '../models/InternalServerErro
 import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
 import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { ResourceNotFoundExceptionResponseContent } from '../models/ResourceNotFoundExceptionResponseContent';
+import { StartGameRequestContent } from '../models/StartGameRequestContent';
 import { StartGameResponseContent } from '../models/StartGameResponseContent';
 import { SubmitGameGuessRequestContent } from '../models/SubmitGameGuessRequestContent';
 import { SubmitGameGuessResponseContent } from '../models/SubmitGameGuessResponseContent';
@@ -266,9 +267,16 @@ export class DefaultApiRequestFactory extends BaseAPIRequestFactory {
     }
 
     /**
+     * @param startGameRequestContent 
      */
-    public async startGame(_options?: Configuration): Promise<RequestContext> {
+    public async startGame(startGameRequestContent: StartGameRequestContent, _options?: Configuration): Promise<RequestContext> {
         let _config = _options || this.configuration;
+
+        // verify required parameter 'startGameRequestContent' is not null or undefined
+        if (startGameRequestContent === null || startGameRequestContent === undefined) {
+            throw new RequiredError('Required parameter startGameRequestContent was null or undefined when calling startGame.');
+        }
+
 
         // Path Params
         const localVarPath = '/v1/game';
@@ -285,6 +293,15 @@ export class DefaultApiRequestFactory extends BaseAPIRequestFactory {
 
 
         // Body Params
+        const contentType = ObjectSerializer.getPreferredMediaType([
+            "application/json"
+        ]);
+        requestContext.setHeaderParam("Content-Type", contentType);
+        const serializedBody = ObjectSerializer.stringify(
+            ObjectSerializer.serialize(startGameRequestContent, "StartGameRequestContent", ""),
+            contentType
+        );
+        requestContext.setBody(serializedBody);
 
         let authMethod = null;
         // Apply auth methods

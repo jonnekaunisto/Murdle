@@ -1,8 +1,14 @@
 import { DynamoDBDocument, GetCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { LobbyDAL } from "..";
-import { gameRounds, gameWaitTimeSeconds, roundDurationSeconds } from "../game/gameRules";
-import { getWordleId, getWordleWord } from "../game/wordle";
+import { gameWaitTimeSeconds, roundDurationSeconds } from "../game/gameRules";
 import { GameItem, PlayerScore, PublicUser, Round } from "../model/items";
+
+export interface CreateGameOptions {
+  lobbyId: string,
+  gameId: string,
+  wordleWords: string[],
+  players: PublicUser[],
+}
 
 export interface UpdatePlayerScoreOptions {
   gameId: string,
@@ -14,19 +20,13 @@ export class GameDAL {
   private static readonly GAME_TABLE_NAME: string = "MurdleGame";
   public constructor(private readonly ddbDocClient: DynamoDBDocument, private readonly lobbyDAL: LobbyDAL) { }
 
-  public async createGame(lobbyId: string): Promise<GameItem | undefined> {
-    const lobbyItem = await this.lobbyDAL.getLobbyById(lobbyId);
-    if (lobbyItem == undefined) {
-      return undefined;
-    }
-
-    const gameId = lobbyId + '.' + getWordleId();
+  public async createGame(options: CreateGameOptions): Promise<GameItem> {
     const currentUnixTime = new Date().getTime();
     const gameItem: GameItem = {
-      GameId: gameId,
-      PlayerScores: this.fillInitialScores(lobbyItem.Players),
-      Rounds: this.fillInitialRounds(),
-      LobbyId: lobbyItem.LobbyId,
+      GameId: options.gameId,
+      PlayerScores: this.fillInitialScores(options.players),
+      Rounds: this.fillInitialRounds(options.wordleWords),
+      LobbyId: options.lobbyId,
       Metadata: {
         CreatedAt: currentUnixTime,
       },
@@ -84,7 +84,7 @@ export class GameDAL {
       return response.Attributes as GameItem | undefined;
     }).catch(error => {
       console.error(error);
-      throw Error("Failed to Remove From Lobby");
+      throw Error("Failed to Update Score");
     });
   }
 
@@ -98,23 +98,23 @@ export class GameDAL {
     });
   }
 
-  private fillInitialRounds(): Round[] {
+  private fillInitialRounds(wordleWords: string[]): Round[] {
     const rounds: Round[] = [];
     const currentUnixTime = new Date().getTime();
     var roundStartTime = currentUnixTime + 1000 * gameWaitTimeSeconds;
 
-    for (let i: number = 0; i < gameRounds; i++) {
+    return wordleWords.map(wordleWord => {
       const roundEndTime = roundStartTime + roundDurationSeconds * 1000
       const round: Round = {
         StartTime: roundStartTime,
         EndTime: roundEndTime,
         Status: "NOT_STARTED",
-        WordleWord: getWordleWord(),
+        WordleWord: wordleWord,
       }
       rounds.push(round);
       roundStartTime = roundEndTime + gameWaitTimeSeconds * 1000;
-    }
-    return rounds;
+      return round;
+    });
   }
 
   private findUserIndexInGame(game: GameItem, userId: string): number | undefined {

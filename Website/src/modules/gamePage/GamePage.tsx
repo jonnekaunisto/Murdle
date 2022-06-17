@@ -40,7 +40,7 @@ function getDisplayName(
   return displayName;
 }
 
-export const LobbyPage: React.FC = () => {
+export const GamePage: React.FC = () => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [players, setPlayers] = useState<Player[]>([]);

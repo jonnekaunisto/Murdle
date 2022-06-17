@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { SyntheticEvent, useEffect, useState } from "react";
 import { LocalUser, LocalUserDAL } from "../../util/localUserDAL";
 import { createClient } from "../../util/murdleClient";
+import { FormButton } from "../common/Buttons";
 
 export const LandingPage: React.FC = () => {
   const router = useRouter();
@@ -106,11 +107,7 @@ export const LandingPage: React.FC = () => {
               onChange={(event) => setUserName(event.target.value)}
             />
           </label>
-          <input
-            type="submit"
-            value="Create Lobby"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          />
+          <FormButton message="Create Lobby" color='red'></FormButton>
         </form>
         <form onSubmit={joinLobby} className="my-5">
           <label>
@@ -124,11 +121,7 @@ export const LandingPage: React.FC = () => {
               onChange={(event) => setJoinLobbyId(event.target.value)}
             />
           </label>
-          <input
-            type="submit"
-            value="Join Lobby"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          />
+          <FormButton message="Join Lobby" color='indigo'></FormButton>
         </form>
       </div>
     </div>

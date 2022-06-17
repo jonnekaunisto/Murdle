@@ -16,11 +16,12 @@ import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
 import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { LobbyStructure } from '../models/LobbyStructure';
 import { PlayerRoundStatus } from '../models/PlayerRoundStatus';
+import { PlayerScore } from '../models/PlayerScore';
 import { PublicUser } from '../models/PublicUser';
 import { ResourceNotFoundExceptionResponseContent } from '../models/ResourceNotFoundExceptionResponseContent';
 import { Round } from '../models/Round';
 import { RoundStatus } from '../models/RoundStatus';
-import { Score } from '../models/Score';
+import { StartGameRequestContent } from '../models/StartGameRequestContent';
 import { StartGameResponseContent } from '../models/StartGameResponseContent';
 import { SubmitGameGuessRequestContent } from '../models/SubmitGameGuessRequestContent';
 import { SubmitGameGuessResponseContent } from '../models/SubmitGameGuessResponseContent';
@@ -378,9 +379,10 @@ export class ObservableDefaultApi {
     }
  
     /**
+     * @param startGameRequestContent 
      */
-    public startGame(_options?: Configuration): Observable<StartGameResponseContent> {
-        const requestContextPromise = this.requestFactory.startGame(_options);
+    public startGame(startGameRequestContent: StartGameRequestContent, _options?: Configuration): Observable<StartGameResponseContent> {
+        const requestContextPromise = this.requestFactory.startGame(startGameRequestContent, _options);
 
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);

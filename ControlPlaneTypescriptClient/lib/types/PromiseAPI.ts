@@ -15,11 +15,12 @@ import { JoinLobbyResponseContent } from '../models/JoinLobbyResponseContent';
 import { LeaveLobbyResponseContent } from '../models/LeaveLobbyResponseContent';
 import { LobbyStructure } from '../models/LobbyStructure';
 import { PlayerRoundStatus } from '../models/PlayerRoundStatus';
+import { PlayerScore } from '../models/PlayerScore';
 import { PublicUser } from '../models/PublicUser';
 import { ResourceNotFoundExceptionResponseContent } from '../models/ResourceNotFoundExceptionResponseContent';
 import { Round } from '../models/Round';
 import { RoundStatus } from '../models/RoundStatus';
-import { Score } from '../models/Score';
+import { StartGameRequestContent } from '../models/StartGameRequestContent';
 import { StartGameResponseContent } from '../models/StartGameResponseContent';
 import { SubmitGameGuessRequestContent } from '../models/SubmitGameGuessRequestContent';
 import { SubmitGameGuessResponseContent } from '../models/SubmitGameGuessResponseContent';
@@ -179,9 +180,10 @@ export class PromiseDefaultApi {
     }
 
     /**
+     * @param startGameRequestContent 
      */
-    public startGame(_options?: Configuration): Promise<StartGameResponseContent> {
-        const result = this.api.startGame(_options);
+    public startGame(startGameRequestContent: StartGameRequestContent, _options?: Configuration): Promise<StartGameResponseContent> {
+        const result = this.api.startGame(startGameRequestContent, _options);
         return result.toPromise();
     }
 

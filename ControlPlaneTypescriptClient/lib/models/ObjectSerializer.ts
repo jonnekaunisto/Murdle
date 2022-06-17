@@ -11,11 +11,12 @@ export * from './JoinLobbyResponseContent';
 export * from './LeaveLobbyResponseContent';
 export * from './LobbyStructure';
 export * from './PlayerRoundStatus';
+export * from './PlayerScore';
 export * from './PublicUser';
 export * from './ResourceNotFoundExceptionResponseContent';
 export * from './Round';
 export * from './RoundStatus';
-export * from './Score';
+export * from './StartGameRequestContent';
 export * from './StartGameResponseContent';
 export * from './SubmitGameGuessRequestContent';
 export * from './SubmitGameGuessResponseContent';
@@ -37,11 +38,12 @@ import { JoinLobbyResponseContent } from './JoinLobbyResponseContent';
 import { LeaveLobbyResponseContent } from './LeaveLobbyResponseContent';
 import { LobbyStructure } from './LobbyStructure';
 import { PlayerRoundStatus } from './PlayerRoundStatus';
+import { PlayerScore } from './PlayerScore';
 import { PublicUser } from './PublicUser';
 import { ResourceNotFoundExceptionResponseContent } from './ResourceNotFoundExceptionResponseContent';
 import { Round } from './Round';
 import { RoundStatus } from './RoundStatus';
-import { Score } from './Score';
+import { StartGameRequestContent } from './StartGameRequestContent';
 import { StartGameResponseContent } from './StartGameResponseContent';
 import { SubmitGameGuessRequestContent } from './SubmitGameGuessRequestContent';
 import { SubmitGameGuessResponseContent } from './SubmitGameGuessResponseContent';
@@ -86,10 +88,11 @@ let typeMap: {[index: string]: any} = {
     "JoinLobbyResponseContent": JoinLobbyResponseContent,
     "LeaveLobbyResponseContent": LeaveLobbyResponseContent,
     "LobbyStructure": LobbyStructure,
+    "PlayerScore": PlayerScore,
     "PublicUser": PublicUser,
     "ResourceNotFoundExceptionResponseContent": ResourceNotFoundExceptionResponseContent,
     "Round": Round,
-    "Score": Score,
+    "StartGameRequestContent": StartGameRequestContent,
     "StartGameResponseContent": StartGameResponseContent,
     "SubmitGameGuessRequestContent": SubmitGameGuessRequestContent,
     "SubmitGameGuessResponseContent": SubmitGameGuessResponseContent,

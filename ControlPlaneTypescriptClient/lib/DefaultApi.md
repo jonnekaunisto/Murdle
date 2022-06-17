@@ -353,7 +353,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](README.md#documentation-for-api-endpoints) [[Back to Model list]](README.md#documentation-for-models) [[Back to README]](README.md)
 
 # **startGame**
-> StartGameResponseContent startGame()
+> StartGameResponseContent startGame(startGameRequestContent)
 
 
 ### Example
@@ -366,7 +366,12 @@ import * as fs from 'fs';
 const configuration = .createConfiguration();
 const apiInstance = new .DefaultApi(configuration);
 
-let body:any = {};
+let body:.DefaultApiStartGameRequest = {
+  // StartGameRequestContent
+  startGameRequestContent: {
+    lobbyId: "lobbyId_example",
+  },
+};
 
 apiInstance.startGame(body).then((data:any) => {
   console.log('API called successfully. Returned data: ' + data);
@@ -375,7 +380,10 @@ apiInstance.startGame(body).then((data:any) => {
 
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **startGameRequestContent** | **StartGameRequestContent**|  |
 
 
 ### Return type
@@ -388,7 +396,7 @@ This endpoint does not need any parameter.
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 

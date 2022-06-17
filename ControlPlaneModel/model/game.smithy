@@ -1,12 +1,12 @@
 namespace com.jonnekaunisto.murdle
 
-structure Score {
+structure PlayerScore {
     @required
-    userId: String,
+    player: PublicUser,
     @required
-    score: String,
+    score: Integer,
     @required
-    totalTime: String,
+    totalTime: Integer,
 }
 
 structure Round {
@@ -22,11 +22,7 @@ structure GameStructure {
     @required
     gameId: String,
     @required
-    scores: ScoresList,
-    @required
-    players: PlayersList,
-    @required
-    totalRounds: Integer,
+    playerScores: PlayerScoresList,
     @required
     rounds: RoundsList,
     @required
@@ -42,6 +38,7 @@ operation StartGame {
 }
 
 structure StartGameInput {
+    @required
     lobbyId: String,
 }
 
@@ -70,12 +67,8 @@ structure DescribeGameOutput {
     game: GameStructure
 }
 
-list PlayersList {
-    member: PublicUser
-}
-
-list ScoresList {
-    member: Score
+list PlayerScoresList {
+    member: PlayerScore
 }
 
 list RoundsList {

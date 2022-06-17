@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { UsersController } from './controllers/users';
-import { CreateLobbyResponseContent, CreateUserRequestContent, CreateUserResponseContent, JoinLobbyResponseContent, LeaveLobbyResponseContent, UpdateUserRequestContent, UpdateUserResponseContent } from "murdle-control-plane-client";
+import { CreateLobbyResponseContent, CreateUserRequestContent, CreateUserResponseContent, DescribeGameResponseContent, JoinLobbyResponseContent, LeaveLobbyResponseContent, StartGameRequestContent, StartGameResponseContent, UpdateUserRequestContent, UpdateUserResponseContent } from "murdle-control-plane-client";
 import { BaseException } from './exceptions';
 import { AuthController, AuthInfo } from './controllers/auth';
-import { UserItem } from 'murdle-service-common';
 import { LobbyController } from './controllers/lobby';
+import { GameController } from './controllers/game';
 const { getCurrentInvoke } = require('@vendia/serverless-express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs').__express;
@@ -13,7 +13,10 @@ const cors = require('cors');
 const compression = require('compression');
 const express = require('express');
 
-export function createApp(usersController: UsersController, lobbyController: LobbyController, authController: AuthController): any {
+export function createApp(usersController: UsersController, 
+    lobbyController: LobbyController,
+    gameController: GameController, 
+    authController: AuthController): any {
   const app = express();
   app.set('view engine', 'ejs');
   app.engine('.ejs', ejs);
@@ -70,6 +73,16 @@ export function createApp(usersController: UsersController, lobbyController: Lob
   // Leave Lobby
   app.delete('/v1/lobby/:lobbyId', (req: Request<{ lobbyId: string }>, res: Response<LeaveLobbyResponseContent, AuthInfo>, next) => {
     lobbyController.leaveLobby(req.params.lobbyId, res).catch(next);
+  });
+
+  // Start Game
+  app.post('/v1/game', (req: Request<{}, {}, StartGameRequestContent>, res: Response<StartGameResponseContent, AuthInfo>, next) => {
+    gameController.startGame(req.body, res).catch(next);
+  });
+
+  // Describe Game
+  app.get('/v1/game/:gameId', (req: Request<{ gameId: string }>, res: Response<DescribeGameResponseContent, AuthInfo>, next) => {
+    gameController.describeGame(req.params.gameId, res).catch(next);
   });
 
   app.use(function (err, req, res: Response, next) {
