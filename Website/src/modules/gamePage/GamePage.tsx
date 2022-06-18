@@ -1,17 +1,28 @@
-import { LobbyStructure, PublicUser } from "murdle-control-plane-client";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { LocalUser, LocalUserDAL } from "../../util/localUserDAL";
 import { createClient } from "../../util/murdleClient";
+import { AlertContainer } from "../wordleComponents/alerts/AlertContainer";
+import {
+  AlertProvider,
+  useAlert,
+} from "../wordleComponents/common/AlertContext";
+import { getWordleWord, isWordleWord } from "../wordleComponents/common/wordle";
 import { Grid } from "../wordleComponents/grid/Grid";
 import { Keyboard } from "../wordleComponents/keyboard/Keyboard";
 
+const solution = getWordleWord().toUpperCase();
+
 export const GamePage: React.FC = () => {
   const router = useRouter();
+  const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
+    useAlert();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [localUser, setLocalUser] = useState<LocalUser | undefined>();
   const [currentGuess, setCurrentGuess] = useState("");
   const [guesses, setGuesses] = useState<string[]>([]);
+  const [currentRowClass, setCurrentRowClass] = useState("");
+  const [isRevealing, setIsRevealing] = useState(false);
 
   function onChar(char: string) {
     if (currentGuess.length < 5) {
@@ -20,13 +31,26 @@ export const GamePage: React.FC = () => {
   }
 
   function onDelete() {
-    setCurrentGuess(currentGuess.substring(0, currentGuess.length-1));
+    setCurrentGuess(currentGuess.substring(0, currentGuess.length - 1));
   }
 
   function onEnter() {
-    if (currentGuess.length == 5) {
+    if (currentGuess.length == 5 && isWordleWord(currentGuess)) {
       guesses.push(currentGuess);
-      setCurrentGuess('');
+      setCurrentGuess("");
+      setIsRevealing(true);
+      // turn this back off after all
+      // chars have been revealed
+      setTimeout(() => {
+        setIsRevealing(false);
+      }, 2000 * 5);
+    } else {
+      setCurrentRowClass("jiggle");
+      showErrorAlert("Word is not valid");
+
+      return setTimeout(() => {
+        setCurrentRowClass("");
+      }, 2000);
     }
   }
 
@@ -35,16 +59,15 @@ export const GamePage: React.FC = () => {
       if (!router.isReady) {
         return;
       }
-      if (typeof router.query.lobbyId !== "string") {
-        setErrorMessage("You cannot join an invalid Lobby.");
+      if (typeof router.query.gameId !== "string") {
+        setErrorMessage("You cannot join an invalid Game.");
         return;
       }
-      const parsedLobbyId = router.query.lobbyId as string;
       const localUserDAL = new LocalUserDAL();
       const user = localUserDAL.getUser();
       setLocalUser(user);
       if (user == undefined) {
-        router.push(`/join/?lobbyId=${parsedLobbyId}`);
+        router.push("/");
         return;
       }
 
@@ -54,35 +77,38 @@ export const GamePage: React.FC = () => {
   );
 
   return (
-    <div className="bg-slate-50 grid place-items-center h-screen">
-      <div className="bg-white p-10 rounded-md drop-shadow">
-        <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">
-          Murdle
-        </h1>{" "}
-        {errorMessage && (
-          <p className="mt-2 text-center text-sm text-red-600 font-medium">
-            {" "}
-            {errorMessage}{" "}
-          </p>
-        )}
-        <div className="pb-6 grow">
-          <Grid
-            solution={'brian'}
+    <AlertProvider>
+      <div className="bg-slate-50 grid place-items-center h-screen">
+        <div className="bg-white p-10 rounded-md drop-shadow">
+          <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">
+            Murdle
+          </h1>{" "}
+          {errorMessage && (
+            <p className="mt-2 text-center text-sm text-red-600 font-medium">
+              {" "}
+              {errorMessage}{" "}
+            </p>
+          )}
+          <div className="pb-6 grow">
+            <Grid
+              solution={solution}
+              guesses={guesses}
+              currentGuess={currentGuess}
+              isRevealing={isRevealing}
+              currentRowClassName={currentRowClass}
+            />
+          </div>
+          <Keyboard
+            onChar={onChar}
+            onDelete={onDelete}
+            onEnter={onEnter}
+            solution={solution}
             guesses={guesses}
-            currentGuess={currentGuess}
-            isRevealing={false}
-            currentRowClassName={"jiggle"}
+            isRevealing={isRevealing}
           />
+          <AlertContainer />
         </div>
-        <Keyboard
-          onChar={onChar}
-          onDelete={onDelete}
-          onEnter={onEnter}
-          solution={'brian'}
-          guesses={guesses}
-          isRevealing={false}
-        />
       </div>
-    </div>
+    </AlertProvider>
   );
 };
