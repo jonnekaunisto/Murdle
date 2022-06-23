@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL } from "murdle-service-common";
+import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round } from "murdle-service-common";
 import { AccessDeniedException, ResourceNotFoundException } from "../exceptions";
-import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, GameStructure, StartGameRequestContent, DescribeGameResponseContent } from "murdle-control-plane-client";
+import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, Round as ExternalRound, GameStructure, StartGameRequestContent, DescribeGameResponseContent } from "murdle-control-plane-client";
 import { AuthInfo } from "./auth";
 import { getWordleId, getWordleWord } from "../util/wordle";
 import { convertUserItemToExternal } from "../util/converter";
@@ -49,9 +49,19 @@ export class GameController {
     return {
       gameId: gameItem.GameId,
       playerScores: gameItem.PlayerScores.map(this.convertPlayerScoreToExternal),
-      rounds: [],
+      rounds: gameItem.Rounds.map(this.convertGameRoundToExternal),
       lobbyId: gameItem.LobbyId,
     }
+  }
+
+  private convertGameRoundToExternal(roundItem: Round): ExternalRound {
+    const externalRound: ExternalRound = {
+      startTime: roundItem.StartTime,
+      endTime: roundItem.EndTime,
+      status: "NOT_STARTED", // TODO: Change based on current time
+      wordleWord: roundItem.WordleWord, // TODO: Only show when game is done
+    }
+    return externalRound
   }
 
   private convertPlayerScoreToExternal(playerScore: PlayerScore): ExternalPlayerScore {

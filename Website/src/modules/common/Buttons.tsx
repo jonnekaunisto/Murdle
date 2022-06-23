@@ -11,3 +11,13 @@ export const FormButton: React.FC<{ message: string, color: ButtonColor, onClick
     />
   );
 };
+
+// TODO: Do this in a better way
+export const ForExport = () => {
+  return (
+    <input
+      type="submit"
+      className={`bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500`}
+    />
+  );
+};

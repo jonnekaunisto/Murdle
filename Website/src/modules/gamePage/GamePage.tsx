@@ -1,3 +1,4 @@
+import { GameStructure, Round } from "murdle-control-plane-client";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { LocalUser, LocalUserDAL } from "../../util/localUserDAL";
@@ -7,11 +8,10 @@ import {
   AlertProvider,
   useAlert,
 } from "../wordleComponents/common/AlertContext";
-import { getWordleWord, isWordleWord } from "../wordleComponents/common/wordle";
+import { isWordleWord } from "../wordleComponents/common/wordle";
 import { Grid } from "../wordleComponents/grid/Grid";
 import { Keyboard } from "../wordleComponents/keyboard/Keyboard";
 
-const solution = getWordleWord().toUpperCase();
 
 export const GamePage: React.FC = () => {
   const router = useRouter();
@@ -23,6 +23,8 @@ export const GamePage: React.FC = () => {
   const [guesses, setGuesses] = useState<string[]>([]);
   const [currentRowClass, setCurrentRowClass] = useState("");
   const [isRevealing, setIsRevealing] = useState(false);
+  const [game, setGame] = useState<GameStructure | undefined>(undefined);
+  const [solution, setSolution] = useState<string | undefined>(undefined);
 
   function onChar(char: string) {
     if (currentGuess.length < 5) {
@@ -37,6 +39,7 @@ export const GamePage: React.FC = () => {
   function onEnter() {
     if (currentGuess.length == 5 && isWordleWord(currentGuess)) {
       guesses.push(currentGuess);
+      setGuesses(guesses);
       setCurrentGuess("");
       setIsRevealing(true);
       // turn this back off after all
@@ -63,6 +66,7 @@ export const GamePage: React.FC = () => {
         setErrorMessage("You cannot join an invalid Game.");
         return;
       }
+      const parsedGameId = router.query.gameId;
       const localUserDAL = new LocalUserDAL();
       const user = localUserDAL.getUser();
       setLocalUser(user);
@@ -72,9 +76,23 @@ export const GamePage: React.FC = () => {
       }
 
       const murdleClient = createClient(user.authToken);
+
+      murdleClient
+        .describeGame(parsedGameId)
+        .then((result) => {
+          setGame(result.game);
+          setSolution(result.game.rounds[0].wordleWord?.toUpperCase())
+        })
+        .catch((error) => {
+          setErrorMessage("Ran into unexpected error")
+        });
     },
     [router.isReady]
   );
+
+  if (game == undefined || solution == undefined) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <AlertProvider>

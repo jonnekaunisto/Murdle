@@ -4,9 +4,10 @@ import { createApp } from '../../lib/app';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 import { UsersController } from '../../lib/controllers/users';
-import { getDefaultTranslateConfig, LobbyDAL, UsersDAL } from 'murdle-service-common';
+import { GameDAL, getDefaultTranslateConfig, LobbyDAL, UsersDAL } from 'murdle-service-common';
 import { AuthController } from "../../lib/controllers/auth";
 import { LobbyController } from "../../lib/controllers/lobby";
+import { GameController } from "../../lib/controllers/game";
 
 interface EventOptions {
   path: string,
@@ -53,10 +54,12 @@ export function createClients(): MurdleClients {
 
   const usersDAL = new UsersDAL(ddbDocClient);
   const lobbyDAL = new LobbyDAL(ddbDocClient);
+  const gameDAL = new GameDAL(ddbDocClient, lobbyDAL);
   const usersController = new UsersController(usersDAL);
   const authController = new AuthController(usersDAL);
   const lobbyController = new LobbyController(lobbyDAL);
-  const app = createApp(usersController, lobbyController, authController);
+  const gameController = new GameController(gameDAL, lobbyDAL);
+  const app = createApp(usersController, lobbyController, gameController, authController);
   const handler = serverlessExpress({ app });
   return {
     handler,

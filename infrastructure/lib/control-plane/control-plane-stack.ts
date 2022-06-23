@@ -14,6 +14,7 @@ import { CertificateValidation, DnsValidatedCertificate } from "aws-cdk-lib/aws-
 export interface ControlPlaneAPIStackProps {
   usersTable: Table,
   lobbyTable: Table,
+  gameTable: Table,
   hostedZone: HostedZone,
 }
 
@@ -33,6 +34,7 @@ export class ControlPlaneStack extends Stack {
 
     props.usersTable.grantReadWriteData(apiFunction);
     props.lobbyTable.grantReadWriteData(apiFunction);
+    props.gameTable.grantReadWriteData(apiFunction);
 
     const alias = apiFunction.latestVersion.addAlias('live');
     (alias.node.defaultChild as CfnAlias).overrideLogicalId('ControlPlaneLambdaAlias');

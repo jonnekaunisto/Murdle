@@ -11,11 +11,14 @@ structure PlayerScore {
 
 structure Round {
     @required
-    startTime: String,
+    startTime: BigInteger,
     @required
-    endTime: String,
+    endTime: BigInteger,
     @required
     status: RoundStatus,
+
+    // Only shown after round is over
+    wordleWord: String,
 }
 
 structure GameStructure {

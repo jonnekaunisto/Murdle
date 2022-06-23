@@ -14,23 +14,30 @@ import { RoundStatus } from './RoundStatus';
 import { HttpFile } from '../http/http';
 
 export class Round {
-    'startTime': string;
-    'endTime': string;
+    'wordleWord'?: string;
+    'startTime': number;
+    'endTime': number;
     'status': RoundStatus;
 
     static readonly discriminator: string | undefined = undefined;
 
     static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
         {
+            "name": "wordleWord",
+            "baseName": "wordleWord",
+            "type": "string",
+            "format": ""
+        },
+        {
             "name": "startTime",
             "baseName": "startTime",
-            "type": "string",
+            "type": "number",
             "format": ""
         },
         {
             "name": "endTime",
             "baseName": "endTime",
-            "type": "string",
+            "type": "number",
             "format": ""
         },
         {

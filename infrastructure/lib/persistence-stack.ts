@@ -13,6 +13,7 @@ export class PersistenceStack extends Stack {
 
   public readonly usersTable: Table;
   public readonly lobbyTable: Table;
+  public readonly gameTable: Table;
   public readonly hostedZone: PublicHostedZone;
 
   public constructor(scope: Construct, id: string, props: PersistenceStackProps) {
@@ -38,6 +39,15 @@ export class PersistenceStack extends Stack {
       tableName: 'MurdleLobby',
       partitionKey: {
         name: 'LobbyId',
+        type: AttributeType.STRING,
+      },
+      billingMode: BillingMode.PAY_PER_REQUEST,
+    });
+
+    this.gameTable = new Table(this, 'GameTable', {
+      tableName: 'MurdleGame',
+      partitionKey: {
+        name: 'GameId',
         type: AttributeType.STRING,
       },
       billingMode: BillingMode.PAY_PER_REQUEST,
