@@ -22,18 +22,21 @@ export class GameState {
     this.gameStatus = this.getGameStatus(game);
   }
 
-  public recalculate(game: GameStructure) {
-    const currentTime = Date.now();
+  public recalculate(game: GameStructure): boolean {
+    var roundChanged = false;
     const { round: currentRound, index: currentRoundIndex} = this.getCurrentRound(game);
     
     // Check if round changed
     if (currentRound.startTime != this.currentRound.startTime) {
       this.currentRound = currentRound;
       this.currentRoundIndex = currentRoundIndex;
+      roundChanged = true;
     }
 
     this.roundStatus = this.getCurrentRoundStatus(currentRound);
     this.gameStatus = this.getGameStatus(game);
+
+    return roundChanged;
   }
 
   private getCurrentRoundStatus(round: Round): RoundStatus {

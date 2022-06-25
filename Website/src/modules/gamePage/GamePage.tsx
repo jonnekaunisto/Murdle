@@ -11,6 +11,7 @@ import {
 import { isWordleWord } from "../wordleComponents/common/wordle";
 import { Grid } from "../wordleComponents/grid/Grid";
 import { Keyboard } from "../wordleComponents/keyboard/Keyboard";
+import { CountDown } from "./CountDown";
 import { GameComplete } from "./GameComplete";
 import { GameState } from "./gameState";
 import { GameWaiting } from "./GameWaiting";
@@ -44,7 +45,7 @@ export const GamePage: React.FC = () => {
       return;
     }
     if (currentGuess.length == 5 && isWordleWord(currentGuess)) {
-      if (currentGuess == gameState.currentRound.wordleWord!) {
+      if (currentGuess == gameState.currentRound.wordleWord?.toUpperCase()!) {
         gameState?.won();
       }
       guesses.push(currentGuess);
@@ -89,7 +90,7 @@ export const GamePage: React.FC = () => {
       murdleClient
         .describeGame(parsedGameId)
         .then((result) => {
-          console.log()
+          console.log();
           setGame(result.game);
           setSolution(result.game.rounds[0].wordleWord?.toUpperCase());
           setGameState(new GameState(result.game));
@@ -108,27 +109,25 @@ export const GamePage: React.FC = () => {
       }
 
       setInterval(() => {
-        console.log('here');
-        console.log(game);
-        console.log(gameState);
         if (game != undefined && gameState != undefined) {
-          gameState.recalculate(game);
+          const roundChanged = gameState.recalculate(game);
           setGameState(Object.assign({}, gameState));
-          console.log("recalculated");
-          console.log(gameState);
+          if (roundChanged) {
+            setCurrentGuess("");
+            setGuesses([]);
+          }
         }
       }, 1000);
     },
     [game != undefined && gameState != undefined]
   );
 
-  console.log('Rerender')
   if (game == undefined || solution == undefined || gameState == undefined) {
     return <p>Loading...</p>;
   }
 
   if (gameState.gameStatus == "complete") {
-    return <GameComplete lobbyId={game.lobbyId}></GameComplete>;
+    return <GameComplete game={game}></GameComplete>;
   }
 
   if (gameState.roundStatus == "lost") {
@@ -155,6 +154,14 @@ export const GamePage: React.FC = () => {
           <h2 className="place-content-center text-center">
             Round: {gameState.currentRoundIndex + 1}
           </h2>
+          <div className="place-content-center text-center">
+            <div>
+              Time Left{" "}
+              <CountDown
+                targetTime={gameState.currentRound.endTime}
+              ></CountDown>
+            </div>
+          </div>
           {errorMessage && (
             <p className="mt-2 text-center text-sm text-red-600 font-medium">
               {" "}
@@ -163,7 +170,7 @@ export const GamePage: React.FC = () => {
           )}
           <div className="pb-6 grow">
             <Grid
-              solution={gameState.currentRound.wordleWord!}
+              solution={gameState.currentRound.wordleWord?.toUpperCase()!}
               guesses={guesses}
               currentGuess={currentGuess}
               isRevealing={isRevealing}
@@ -174,7 +181,7 @@ export const GamePage: React.FC = () => {
             onChar={onChar}
             onDelete={onDelete}
             onEnter={onEnter}
-            solution={gameState.currentRound.wordleWord!}
+            solution={gameState.currentRound.wordleWord?.toUpperCase()!}
             guesses={guesses}
             isRevealing={isRevealing}
           />

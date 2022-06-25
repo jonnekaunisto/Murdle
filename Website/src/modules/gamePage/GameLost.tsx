@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
 
-/*
-
-*/
-
 function calculateTimeLeft(startTime: number): number {
   const currentTime = Date.now();
 
