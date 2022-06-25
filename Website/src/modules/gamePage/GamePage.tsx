@@ -1,4 +1,4 @@
-import { GameStructure, Round } from "murdle-control-plane-client";
+import { GameStructure } from "murdle-control-plane-client";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { LocalUser, LocalUserDAL } from "../../util/localUserDAL";
@@ -11,7 +11,9 @@ import {
 import { isWordleWord } from "../wordleComponents/common/wordle";
 import { Grid } from "../wordleComponents/grid/Grid";
 import { Keyboard } from "../wordleComponents/keyboard/Keyboard";
-
+import { GameComplete } from "./GameComplete";
+import { GameState } from "./gameState";
+import { GameWaiting } from "./GameWaiting";
 
 export const GamePage: React.FC = () => {
   const router = useRouter();
@@ -25,6 +27,7 @@ export const GamePage: React.FC = () => {
   const [isRevealing, setIsRevealing] = useState(false);
   const [game, setGame] = useState<GameStructure | undefined>(undefined);
   const [solution, setSolution] = useState<string | undefined>(undefined);
+  const [gameState, setGameState] = useState<GameState | undefined>(undefined);
 
   function onChar(char: string) {
     if (currentGuess.length < 5) {
@@ -37,7 +40,13 @@ export const GamePage: React.FC = () => {
   }
 
   function onEnter() {
+    if (gameState == undefined) {
+      return;
+    }
     if (currentGuess.length == 5 && isWordleWord(currentGuess)) {
+      if (currentGuess == gameState.currentRound.wordleWord!) {
+        gameState?.won();
+      }
       guesses.push(currentGuess);
       setGuesses(guesses);
       setCurrentGuess("");
@@ -80,18 +89,60 @@ export const GamePage: React.FC = () => {
       murdleClient
         .describeGame(parsedGameId)
         .then((result) => {
+          console.log()
           setGame(result.game);
-          setSolution(result.game.rounds[0].wordleWord?.toUpperCase())
+          setSolution(result.game.rounds[0].wordleWord?.toUpperCase());
+          setGameState(new GameState(result.game));
         })
         .catch((error) => {
-          setErrorMessage("Ran into unexpected error")
+          setErrorMessage("Ran into unexpected error");
         });
     },
     [router.isReady]
   );
 
-  if (game == undefined || solution == undefined) {
+  useEffect(
+    function () {
+      if (game == undefined || gameState == undefined) {
+        return;
+      }
+
+      setInterval(() => {
+        console.log('here');
+        console.log(game);
+        console.log(gameState);
+        if (game != undefined && gameState != undefined) {
+          gameState.recalculate(game);
+          setGameState(Object.assign({}, gameState));
+          console.log("recalculated");
+          console.log(gameState);
+        }
+      }, 1000);
+    },
+    [game != undefined && gameState != undefined]
+  );
+
+  console.log('Rerender')
+  if (game == undefined || solution == undefined || gameState == undefined) {
     return <p>Loading...</p>;
+  }
+
+  if (gameState.gameStatus == "complete") {
+    return <GameComplete lobbyId={game.lobbyId}></GameComplete>;
+  }
+
+  if (gameState.roundStatus == "lost") {
+    return <p>Lost...</p>;
+  }
+
+  if (gameState.roundStatus == "waiting") {
+    return (
+      <GameWaiting startTime={gameState.currentRound.startTime}></GameWaiting>
+    );
+  }
+
+  if (gameState.roundStatus == "won") {
+    return <p>Won...</p>;
   }
 
   return (
@@ -101,6 +152,9 @@ export const GamePage: React.FC = () => {
           <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">
             Murdle
           </h1>{" "}
+          <h2 className="place-content-center text-center">
+            Round: {gameState.currentRoundIndex + 1}
+          </h2>
           {errorMessage && (
             <p className="mt-2 text-center text-sm text-red-600 font-medium">
               {" "}
@@ -109,7 +163,7 @@ export const GamePage: React.FC = () => {
           )}
           <div className="pb-6 grow">
             <Grid
-              solution={solution}
+              solution={gameState.currentRound.wordleWord!}
               guesses={guesses}
               currentGuess={currentGuess}
               isRevealing={isRevealing}
@@ -120,7 +174,7 @@ export const GamePage: React.FC = () => {
             onChar={onChar}
             onDelete={onDelete}
             onEnter={onEnter}
-            solution={solution}
+            solution={gameState.currentRound.wordleWord!}
             guesses={guesses}
             isRevealing={isRevealing}
           />

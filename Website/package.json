@@ -10,6 +10,7 @@
   "dependencies": {
     "@headlessui/react": "^1.6.4",
     "classnames": "^2.3.1",
+    "daisyui": "^2.17.0",
     "murdle-control-plane-client": "file:../ControlPlaneTypescriptClient/lib",
     "next": "12.1.6",
     "qrcode.react": "^3.0.2",

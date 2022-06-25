@@ -25,7 +25,7 @@ export class GameController {
     }
     
     const gameItem = await this.gameDAL.createGame({
-      gameId: `${lobbyItem.LobbyId}${getWordleId()}`,
+      gameId: `${lobbyItem.LobbyId}.${getWordleId()}`,
       lobbyId: body.lobbyId,
       wordleWords,
       players: lobbyItem.Players,
