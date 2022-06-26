@@ -18,9 +18,13 @@ export const GameComplete: React.FC<{ game: GameStructure }> = ({ game }) => {
         <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">
           Murdle
         </h1>
-        
-       <Scores game={game}></Scores>
-        <FormButton message={"Return to Lobby"} color={"red"} onClick={returnToLobby}></FormButton>
+
+        <Scores playerScores={game.playerScores}></Scores>
+        <FormButton
+          message={"Return to Lobby"}
+          color={"red"}
+          onClick={returnToLobby}
+        ></FormButton>
       </div>
     </div>
   );

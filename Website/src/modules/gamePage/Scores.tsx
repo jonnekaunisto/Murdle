@@ -1,10 +1,10 @@
-import { GameStructure } from "murdle-control-plane-client";
+import { PlayerScore } from "murdle-control-plane-client";
 
-export const Scores: React.FC<{ game: GameStructure }> = ({ game }) => {
+export const Scores: React.FC<{ playerScores: PlayerScore[] }> = ({ playerScores }) => {
   return (
     <div>
       <h2>Scores: </h2>
-      {game.playerScores
+      {playerScores
         .sort((scoreA, scoreB) => scoreA.score - scoreB.score)
         .map((score) => {
           return (

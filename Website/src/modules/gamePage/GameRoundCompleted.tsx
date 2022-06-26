@@ -1,4 +1,7 @@
+import { GameStructure } from "murdle-control-plane-client";
 import { useEffect, useState } from "react";
+
+export type GameRoundCompletionType = "won" | "lost";
 
 function calculateTimeLeft(startTime: number): number {
   const currentTime = Date.now();
@@ -6,7 +9,10 @@ function calculateTimeLeft(startTime: number): number {
   return Math.round((startTime - currentTime) / 1000);
 }
 
-export const GameLost: React.FC<{ startTime: number }> = ({ startTime }) => {
+export const GameRoundCompleted: React.FC<{
+  startTime: number;
+  completionType: GameRoundCompletionType;
+}> = ({ startTime, completionType }) => {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(startTime));
 
   useEffect(() => {
@@ -20,8 +26,9 @@ export const GameLost: React.FC<{ startTime: number }> = ({ startTime }) => {
         <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">
           Murdle
         </h1>
+        <p className="place-content-center text-center ">You {completionType} this round!</p>
         <div>
-          <p>The round will start in {timeLeft} seconds</p>
+          <p>The next round will start in {timeLeft} seconds</p>
         </div>
       </div>
     </div>
