@@ -1,3 +1,3 @@
-import { JoinLobbyPage } from '../modules/lobbyPage/JoinLobbyPage'
+import { JoinLobbyPage } from '../modules/joinLobbyPage/JoinLobbyPage'
 
 export default JoinLobbyPage;
