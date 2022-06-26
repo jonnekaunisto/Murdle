@@ -62,7 +62,7 @@ export const LoadedGame: React.FC<{ game: GameStructure }> = ({ game }) => {
 
   if (gameState.roundStatus == "waiting") {
     return (
-      <GameWaiting startTime={gameState.currentRound.startTime}></GameWaiting>
+      <GameWaiting startTime={gameState.currentRound.startTime} lastRound={gameState.lastRound} playerScores={gameState.playerScores}></GameWaiting>
     );
   }
 

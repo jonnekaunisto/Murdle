@@ -12,13 +12,15 @@ export const GameComplete: React.FC<{ game: GameStructure }> = ({ game }) => {
     router.push(`/lobby/?lobbyId=${game.lobbyId}`);
   }
 
+  const lastRound = game.rounds[game.rounds.length - 1];
+
   return (
     <div className="bg-slate-50 grid place-items-center h-screen">
       <div className="bg-white p-10 rounded-md drop-shadow">
         <h1 className="place-content-center text-center text-4xl tracking-tight font-extrabold text-5xl block text-indigo-600">
           Murdle
         </h1>
-
+        <p className="place-content-center text-center">The word was {lastRound.wordleWord?.toUpperCase()}</p>
         <Scores playerScores={game.playerScores}></Scores>
         <FormButton
           message={"Return to Lobby"}
