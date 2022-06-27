@@ -21,6 +21,25 @@ structure Round {
     wordleWord: String,
 }
 
+structure GuessedLetterResult {
+    @required
+    letter: String,
+    @required
+    status: LetterStatus,
+}
+
+structure PlayerGuess {
+    @required
+    guessedWord: String,
+    @required
+    guessLetterResult: GuessedLetterResults
+}
+
+structure CurrentPlayerRoundState {
+    @required
+    playerGuesses: PlayerGuesses
+}
+
 structure GameStructure {
     @required
     gameId: String,
@@ -30,6 +49,9 @@ structure GameStructure {
     rounds: RoundsList,
     @required
     lobbyId: String,
+
+    @required
+    currentPlayerRoundStates: CurrentPlayerRoundStates,
 }
 
 // Create
@@ -74,6 +96,18 @@ list PlayerScoresList {
     member: PlayerScore
 }
 
+list CurrentPlayerRoundStates {
+    member: CurrentPlayerRoundState
+}
+
+list GuessedLetterResults {
+    member: GuessedLetterResult
+}
+
+list PlayerGuesses {
+    member: PlayerGuess
+}
+
 list RoundsList {
     member: Round
 }
@@ -93,3 +127,20 @@ list RoundsList {
     }
 ])
 string RoundStatus
+
+
+@enum([
+    {
+        value: "ABSENT",
+        name: "ABSENT"
+    },
+    {
+        value: "CORRECT",
+        name: "CORRECT"
+    },
+    {
+        value: "PRESENT",
+        name: "PRESENT"
+    }
+])
+string LetterStatus

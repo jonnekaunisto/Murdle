@@ -10,24 +10,31 @@
  * Do not edit the class manually.
  */
 
-import { GameStructure } from './GameStructure';
+import { GuessedLetterResult } from './GuessedLetterResult';
 import { HttpFile } from '../http/http';
 
-export class SubmitGameGuessResponseContent {
-    'game'?: GameStructure;
+export class PlayerGuess {
+    'guessLetterResult': Array<GuessedLetterResult>;
+    'guessedWord': string;
 
     static readonly discriminator: string | undefined = undefined;
 
     static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
         {
-            "name": "game",
-            "baseName": "game",
-            "type": "GameStructure",
+            "name": "guessLetterResult",
+            "baseName": "guessLetterResult",
+            "type": "Array<GuessedLetterResult>",
+            "format": ""
+        },
+        {
+            "name": "guessedWord",
+            "baseName": "guessedWord",
+            "type": "string",
             "format": ""
         }    ];
 
     static getAttributeTypeMap() {
-        return SubmitGameGuessResponseContent.attributeTypeMap;
+        return PlayerGuess.attributeTypeMap;
     }
     
     public constructor() {

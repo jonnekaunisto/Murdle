@@ -12,4 +12,4 @@
 
 import { HttpFile } from '../http/http';
 
-export type PlayerRoundStatus = "NOT_STARTED" | "IN_PROGRESS" | "DONE" ;
+export type LetterStatus = "ABSENT" | "CORRECT" | "PRESENT" ;

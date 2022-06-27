@@ -10,31 +10,31 @@
  * Do not edit the class manually.
  */
 
-import { PlayerRoundStatus } from './PlayerRoundStatus';
+import { LetterStatus } from './LetterStatus';
 import { HttpFile } from '../http/http';
 
-export class GameRoundPlayerState {
-    'roundPlayerStatus'?: PlayerRoundStatus;
-    'guessedWords'?: Array<string>;
+export class GuessedLetterResult {
+    'letter': string;
+    'status': LetterStatus;
 
     static readonly discriminator: string | undefined = undefined;
 
     static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
         {
-            "name": "roundPlayerStatus",
-            "baseName": "roundPlayerStatus",
-            "type": "PlayerRoundStatus",
+            "name": "letter",
+            "baseName": "letter",
+            "type": "string",
             "format": ""
         },
         {
-            "name": "guessedWords",
-            "baseName": "guessedWords",
-            "type": "Array<string>",
+            "name": "status",
+            "baseName": "status",
+            "type": "LetterStatus",
             "format": ""
         }    ];
 
     static getAttributeTypeMap() {
-        return GameRoundPlayerState.attributeTypeMap;
+        return GuessedLetterResult.attributeTypeMap;
     }
     
     public constructor() {

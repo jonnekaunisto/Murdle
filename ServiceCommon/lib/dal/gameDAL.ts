@@ -1,13 +1,20 @@
 import { DynamoDBDocument, GetCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { LobbyDAL } from "..";
-import { gameWaitTimeSeconds, roundDurationSeconds } from "../game/gameRules";
-import { GameItem, PlayerScore, PublicUser, Round } from "../model/items";
+import { gameRounds, gameWaitTimeSeconds, roundDurationSeconds } from "../game/gameRules";
+import { GameItem, PlayerGuess, PlayerRoundState, PlayerScore, PublicUser, Round } from "../model/items";
 
 export interface CreateGameOptions {
   lobbyId: string,
   gameId: string,
   wordleWords: string[],
   players: PublicUser[],
+}
+
+export interface AddPlayerGuessOptions {
+  gameId: string,
+  userId: string,
+  roundNumber: number,
+  playerGuess: PlayerGuess,
 }
 
 export interface UpdatePlayerScoreOptions {
@@ -59,6 +66,48 @@ export class GameDAL {
     });
   }
 
+  public async addPlayerGuess(options: AddPlayerGuessOptions): Promise<GameItem | undefined> {
+    const gameItem = await this.getGameById(options.gameId);
+    if (gameItem == undefined) {
+      console.log('Game not found');
+      return undefined;
+    }
+
+    const userIndex = this.findUserIndexInGame(gameItem, options.userId);
+    if (userIndex == undefined) {
+      console.log('User not found');
+      return undefined;
+    }
+
+    if (options.roundNumber > gameItem.Rounds.length) {
+      console.log('Round not found')
+      return undefined;
+    }
+    const roundIndex = options.roundNumber - 1;
+
+    const attributeLocation = `#ps[${roundIndex}].#prs[${roundIndex}].#pg`;
+    
+    return this.ddbDocClient.update({
+      TableName: GameDAL.GAME_TABLE_NAME,
+      Key: {
+        GameId: options.gameId,
+      },
+      UpdateExpression: `SET ${attributeLocation} = list_append(${attributeLocation}, :vals)`,
+      ExpressionAttributeNames: { 
+        '#ps': 'PlayerScores',
+        '#prs': 'PlayerRoundStates',
+        '#pg': 'PlayerGuesses',
+     },
+      ExpressionAttributeValues: { ':vals': [options.playerGuess] },
+      ReturnValues: 'ALL_NEW',
+    }).then(response => {
+      return response.Attributes as GameItem | undefined;
+    }).catch(error => {
+      console.error(error);
+      throw Error("Failed to Add To Guesses");
+    });
+  }
+
   public async updatePlayerScore(options: UpdatePlayerScoreOptions): Promise<GameItem | undefined> {
     const gameItem = await this.getGameById(options.gameId);
     if (gameItem == undefined) {
@@ -94,8 +143,19 @@ export class GameDAL {
         Player: player,
         Score: 0,
         TotalTime: 0,
+        PlayerRoundStates: this.fillInitialRoundState(),
       }
     });
+  }
+
+  private fillInitialRoundState(): PlayerRoundState[] {
+    const playerRoundStates: PlayerRoundState[] = [];
+    for(let i = 0; i < gameRounds; i++) {
+      playerRoundStates.push({
+        PlayerGuesses: [],
+      });
+    }
+    return playerRoundStates;
   }
 
   private fillInitialRounds(wordleWords: string[]): Round[] {

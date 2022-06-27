@@ -20,3 +20,7 @@ Stacks that can be deployed are `MurdleControlPlane`, `MurdleWebsite` and `Murdl
 ## Setting up credentials
 
 Use credentials from SSO: https://docs.aws.amazon.com/toolkit-for-visual-studio/latest/user-guide/sso-credentials.html
+
+The run:
+* aws sso login --profile 731268853614_AdministratorAccess
+* aws sso login --profile 714313996820_AdministratorAccess

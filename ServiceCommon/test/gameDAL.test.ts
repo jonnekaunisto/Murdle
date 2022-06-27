@@ -1,7 +1,7 @@
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { getDefaultTranslateConfig } from '../lib/dal/config';
-import { GameItem, LobbyItem, PublicUser } from '../lib';
+import { GameItem, LobbyItem, PlayerGuess, PublicUser } from '../lib';
 import { LobbyDAL } from "../lib/dal/lobbyDAL";
 import { GameDAL } from "../lib/dal/gameDAL";
 
@@ -18,7 +18,7 @@ const player: PublicUser = {
 const testLobby: LobbyItem = {
   LobbyId: 'MockLobbyIdForGame',
   OwnerUserId: lobbyOwner.UserId,
-  Players: [lobbyOwner],
+  Players: [lobbyOwner, player],
   Metadata: {
     CreatedAt: 1,
   },
@@ -40,6 +40,20 @@ const testGame: GameItem = {
       },
       Score: 0,
       TotalTime: 0,
+      PlayerRoundStates: [
+        {
+          PlayerGuesses: []
+        },
+        {
+          PlayerGuesses: []
+        },
+        {
+          PlayerGuesses: []
+        },
+        {
+          PlayerGuesses: []
+        }
+      ]
     },
     {
       Player: {
@@ -48,6 +62,20 @@ const testGame: GameItem = {
       },
       Score: 0,
       TotalTime: 0,
+      PlayerRoundStates: [
+        {
+          PlayerGuesses: []
+        },
+        {
+          PlayerGuesses: []
+        },
+        {
+          PlayerGuesses: []
+        },
+        {
+          PlayerGuesses: []
+        }
+      ]
     },
   ],
   Rounds: [
@@ -68,6 +96,16 @@ const testGame: GameItem = {
   Metadata: {
     CreatedAt: 1,
   }
+}
+
+const testPlayerGuess: PlayerGuess = {
+  Guess: 'crate',
+  GuessedLetterResults: [
+    {
+      Letter: 'h',
+      LetterStatus: 'CORRECT'
+    },
+  ]
 }
 
 const ddb = DynamoDBDocument.from(
@@ -93,29 +131,9 @@ describe('End to End', () => {
     jest.useRealTimers()
   });
   test('CRUD', async () => {
-    // Setup Lobby
-    const lobbyItem = await lobbyDAL.createLobby({
-      lobbyId: testLobby.LobbyId,
-      ownerUser: lobbyOwner,
-    });
-    // Add Player
-    const addLobby = await lobbyDAL.addUserToLobby({
-      lobbyId: testLobby.LobbyId,
-      publicUser: player,
-    });
-
-    // Create Game for non existent lobby
-    const undefinedGame = await gameDAL.createGame({
-      lobbyId: 'NoExist',
-      gameId: testGame.GameId,
-      wordleWords: testWordleWords,
-      players: testLobby.Players,
-    });
-    expect(undefinedGame).toBeUndefined();
-
     // Create Game
     const initialGame = await gameDAL.createGame({
-      lobbyId: lobbyItem.LobbyId,
+      lobbyId: testLobby.LobbyId,
       gameId: testGame.GameId,
       wordleWords: testWordleWords,
       players: testLobby.Players,
@@ -150,5 +168,14 @@ describe('End to End', () => {
     }
     testGame.PlayerScores[0].Score = newScore;
     expect(updatedGame).toEqual(testGame);
+
+    const gameWithPlayerGuess = await gameDAL.addPlayerGuess({
+      gameId: testGame.GameId,
+      userId: lobbyOwner.UserId,
+      roundNumber: 1,
+      playerGuess: testPlayerGuess,
+    });
+    testGame.PlayerScores[0].PlayerRoundStates[0].PlayerGuesses.push(testPlayerGuess);
+    expect(gameWithPlayerGuess).toEqual(testGame);
   });
 });

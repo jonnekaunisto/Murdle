@@ -3,14 +3,16 @@ export * from './AdminRemoveFromLobbyResponseContent';
 export * from './CreateLobbyResponseContent';
 export * from './CreateUserRequestContent';
 export * from './CreateUserResponseContent';
+export * from './CurrentPlayerRoundState';
 export * from './DescribeGameResponseContent';
-export * from './GameRoundPlayerState';
 export * from './GameStructure';
+export * from './GuessedLetterResult';
 export * from './InternalServerErrorResponseContent';
 export * from './JoinLobbyResponseContent';
 export * from './LeaveLobbyResponseContent';
+export * from './LetterStatus';
 export * from './LobbyStructure';
-export * from './PlayerRoundStatus';
+export * from './PlayerGuess';
 export * from './PlayerScore';
 export * from './PublicUser';
 export * from './ResourceNotFoundExceptionResponseContent';
@@ -30,14 +32,16 @@ import { AdminRemoveFromLobbyResponseContent } from './AdminRemoveFromLobbyRespo
 import { CreateLobbyResponseContent } from './CreateLobbyResponseContent';
 import { CreateUserRequestContent } from './CreateUserRequestContent';
 import { CreateUserResponseContent } from './CreateUserResponseContent';
+import { CurrentPlayerRoundState } from './CurrentPlayerRoundState';
 import { DescribeGameResponseContent } from './DescribeGameResponseContent';
-import { GameRoundPlayerState } from './GameRoundPlayerState';
 import { GameStructure } from './GameStructure';
+import { GuessedLetterResult } from './GuessedLetterResult';
 import { InternalServerErrorResponseContent } from './InternalServerErrorResponseContent';
 import { JoinLobbyResponseContent } from './JoinLobbyResponseContent';
 import { LeaveLobbyResponseContent } from './LeaveLobbyResponseContent';
+import { LetterStatus } from './LetterStatus';
 import { LobbyStructure } from './LobbyStructure';
-import { PlayerRoundStatus } from './PlayerRoundStatus';
+import { PlayerGuess } from './PlayerGuess';
 import { PlayerScore } from './PlayerScore';
 import { PublicUser } from './PublicUser';
 import { ResourceNotFoundExceptionResponseContent } from './ResourceNotFoundExceptionResponseContent';
@@ -71,7 +75,7 @@ const supportedMediaTypes: { [mediaType: string]: number } = {
 
                  
 let enumsMap: Set<string> = new Set<string>([
-    "PlayerRoundStatus",
+    "LetterStatus",
     "RoundStatus",
 ]);
 
@@ -81,13 +85,15 @@ let typeMap: {[index: string]: any} = {
     "CreateLobbyResponseContent": CreateLobbyResponseContent,
     "CreateUserRequestContent": CreateUserRequestContent,
     "CreateUserResponseContent": CreateUserResponseContent,
+    "CurrentPlayerRoundState": CurrentPlayerRoundState,
     "DescribeGameResponseContent": DescribeGameResponseContent,
-    "GameRoundPlayerState": GameRoundPlayerState,
     "GameStructure": GameStructure,
+    "GuessedLetterResult": GuessedLetterResult,
     "InternalServerErrorResponseContent": InternalServerErrorResponseContent,
     "JoinLobbyResponseContent": JoinLobbyResponseContent,
     "LeaveLobbyResponseContent": LeaveLobbyResponseContent,
     "LobbyStructure": LobbyStructure,
+    "PlayerGuess": PlayerGuess,
     "PlayerScore": PlayerScore,
     "PublicUser": PublicUser,
     "ResourceNotFoundExceptionResponseContent": ResourceNotFoundExceptionResponseContent,

@@ -428,6 +428,7 @@ let body:.DefaultApiSubmitGameGuessRequest = {
   gameId: "gameId_example",
   // SubmitGameGuessRequestContent
   submitGameGuessRequestContent: {
+    roundNumber: 3.14,
     guess: "guess_example",
   },
 };

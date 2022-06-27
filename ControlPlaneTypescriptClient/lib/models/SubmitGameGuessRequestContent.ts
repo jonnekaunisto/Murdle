@@ -13,11 +13,18 @@
 import { HttpFile } from '../http/http';
 
 export class SubmitGameGuessRequestContent {
+    'roundNumber': number;
     'guess': string;
 
     static readonly discriminator: string | undefined = undefined;
 
     static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
+        {
+            "name": "roundNumber",
+            "baseName": "roundNumber",
+            "type": "number",
+            "format": "int32"
+        },
         {
             "name": "guess",
             "baseName": "guess",

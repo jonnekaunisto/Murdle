@@ -36,6 +36,7 @@ export interface PlayerScore {
   Player: PublicUser,
   Score: number,
   TotalTime: number,
+  PlayerRoundStates: PlayerRoundState[],
 }
 
 export interface Round {
@@ -43,6 +44,26 @@ export interface Round {
   EndTime: number,
   Status: RoundStatus,
   WordleWord: string,
+}
+
+export type LetterStatus = 'ABSENT' | 'CORRECT' | 'PRESENT';
+export interface GuessedLetterResult {
+  Letter: string,
+  LetterStatus: LetterStatus,
+}
+
+export interface PlayerGuess {
+  Guess: string,
+  GuessedLetterResults: GuessedLetterResult[],
+}
+
+export interface PlayerRoundState {
+  PlayerGuesses: PlayerGuess[],
+}
+
+export interface PlayerGameState {
+  UserId: string,
+  PlayerRoundStates: PlayerRoundState[],
 }
 
 export interface GameItem {

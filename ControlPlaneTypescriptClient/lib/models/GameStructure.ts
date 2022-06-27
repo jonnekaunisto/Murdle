@@ -10,6 +10,7 @@
  * Do not edit the class manually.
  */
 
+import { CurrentPlayerRoundState } from './CurrentPlayerRoundState';
 import { PlayerScore } from './PlayerScore';
 import { Round } from './Round';
 import { HttpFile } from '../http/http';
@@ -17,6 +18,7 @@ import { HttpFile } from '../http/http';
 export class GameStructure {
     'gameId': string;
     'playerScores': Array<PlayerScore>;
+    'currentPlayerRoundStates': Array<CurrentPlayerRoundState>;
     'rounds': Array<Round>;
     'lobbyId': string;
 
@@ -33,6 +35,12 @@ export class GameStructure {
             "name": "playerScores",
             "baseName": "playerScores",
             "type": "Array<PlayerScore>",
+            "format": ""
+        },
+        {
+            "name": "currentPlayerRoundStates",
+            "baseName": "currentPlayerRoundStates",
+            "type": "Array<CurrentPlayerRoundState>",
             "format": ""
         },
         {
