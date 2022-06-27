@@ -73,7 +73,7 @@ export class GameDAL {
       return undefined;
     }
 
-    const userIndex = this.findUserIndexInGame(gameItem, options.userId);
+    const userIndex = GameDAL.findUserIndexInGame(gameItem, options.userId);
     if (userIndex == undefined) {
       console.log('User not found');
       return undefined;
@@ -114,7 +114,7 @@ export class GameDAL {
       return undefined;
     }
 
-    const userIndex = this.findUserIndexInGame(gameItem, options.userId);
+    const userIndex = GameDAL.findUserIndexInGame(gameItem, options.userId);
     if (userIndex == undefined) {
       return undefined;
     }
@@ -177,7 +177,7 @@ export class GameDAL {
     });
   }
 
-  private findUserIndexInGame(game: GameItem, userId: string): number | undefined {
+  public static findUserIndexInGame(game: GameItem, userId: string): number | undefined {
     var playerIndex: number | undefined;
     game.PlayerScores.forEach((playerScore, index) => {
       if (playerScore.Player.UserId == userId) {

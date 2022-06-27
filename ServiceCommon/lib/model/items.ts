@@ -54,7 +54,6 @@ export interface GuessedLetterResult {
 
 export interface PlayerGuess {
   Guess: string,
-  GuessedLetterResults: GuessedLetterResult[],
 }
 
 export interface PlayerRoundState {

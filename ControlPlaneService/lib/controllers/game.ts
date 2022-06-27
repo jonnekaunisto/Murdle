@@ -1,13 +1,14 @@
 import { Response } from "express";
-import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round } from "murdle-service-common";
+import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round, PlayerGuess } from "murdle-service-common";
 import { AccessDeniedException, ResourceNotFoundException } from "../exceptions";
-import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, Round as ExternalRound, GameStructure, StartGameRequestContent, DescribeGameResponseContent } from "murdle-control-plane-client";
+import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, Round as ExternalRound, GameStructure, StartGameRequestContent, DescribeGameResponseContent, CurrentPlayerRoundState, PlayerGuess as ExternalPlayerGuess } from "murdle-control-plane-client";
 import { AuthInfo } from "./auth";
 import { getWordleId, getWordleWord } from "../util/wordle";
 import { convertUserItemToExternal } from "../util/converter";
+import { calculateMatchingLetters } from "../util/gameLogic";
 
 export class GameController {
-  public constructor(private readonly gameDAL: GameDAL, private readonly lobbyDAL: LobbyDAL) {}
+  public constructor(private readonly gameDAL: GameDAL, private readonly lobbyDAL: LobbyDAL) { }
 
   public async startGame(body: StartGameRequestContent, res: Response<StartGameResponseContent, AuthInfo>) {
     const authenticatedUser = res.locals.authenticatedUser;
@@ -23,7 +24,7 @@ export class GameController {
     for (let i: number = 0; i < gameRounds; i++) {
       wordleWords.push(getWordleWord());
     }
-    
+
     const gameItem = await this.gameDAL.createGame({
       gameId: `${lobbyItem.LobbyId}.${getWordleId()}`,
       lobbyId: body.lobbyId,
@@ -31,27 +32,51 @@ export class GameController {
       players: lobbyItem.Players,
     });
     res.send({
-      game: this.convertGameItemToExternal(gameItem),
+      game: this.convertGameItemToExternal(authenticatedUser.UserId, gameItem),
     });
   }
 
   public async describeGame(gameId: string, res: Response<DescribeGameResponseContent, AuthInfo>) {
+    const authenticatedUser = res.locals.authenticatedUser;
     const gameItem = await this.gameDAL.getGameById(gameId);
     if (gameItem == undefined) {
       throw new ResourceNotFoundException('Game not found');
     }
     res.send({
-      game: this.convertGameItemToExternal(gameItem),
+      game: this.convertGameItemToExternal(authenticatedUser.UserId, gameItem),
     });
   }
 
-  private convertGameItemToExternal(gameItem: GameItem): GameStructure {
+  private convertGameItemToExternal(currentUserId: string, gameItem: GameItem): GameStructure {
     return {
       gameId: gameItem.GameId,
       playerScores: gameItem.PlayerScores.map(this.convertPlayerScoreToExternal),
       rounds: gameItem.Rounds.map(this.convertGameRoundToExternal),
       lobbyId: gameItem.LobbyId,
+      currentPlayerRoundStates: this.getCurrentPlayerRoundStates(currentUserId, gameItem),
     }
+  }
+
+  private getCurrentPlayerRoundStates(currentUserId: string, gameItem: GameItem): CurrentPlayerRoundState[] {
+    const userIndex = GameDAL.findUserIndexInGame(gameItem, currentUserId);
+    if (userIndex == undefined) {
+      return [];
+    }
+
+    return gameItem.PlayerScores[userIndex].PlayerRoundStates.map((playerRoundState, index) => {
+      const roundWord = gameItem.Rounds[index].WordleWord;
+      return {
+        playerGuesses: playerRoundState.PlayerGuesses.map(playerGuess => 
+            this.convertPlayerRoundStateToExternal(playerGuess, roundWord)),
+      }
+    })
+  }
+
+  private convertPlayerRoundStateToExternal(playerGuess: PlayerGuess, solution: string): ExternalPlayerGuess {
+    return {
+      guessedWord: playerGuess.Guess,
+      guessLetterResult: calculateMatchingLetters(solution, playerGuess.Guess),
+    };
   }
 
   private convertGameRoundToExternal(roundItem: Round): ExternalRound {

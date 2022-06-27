@@ -100,12 +100,6 @@ const testGame: GameItem = {
 
 const testPlayerGuess: PlayerGuess = {
   Guess: 'crate',
-  GuessedLetterResults: [
-    {
-      Letter: 'h',
-      LetterStatus: 'CORRECT'
-    },
-  ]
 }
 
 const ddb = DynamoDBDocument.from(
