@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round, PlayerGuess } from "murdle-service-common";
-import { AccessDeniedException, ResourceNotFoundException } from "../exceptions";
-import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, Round as ExternalRound, GameStructure, StartGameRequestContent, DescribeGameResponseContent, CurrentPlayerRoundState, PlayerGuess as ExternalPlayerGuess } from "murdle-control-plane-client";
+import { AccessDeniedException, ResourceNotFoundException, ValidationException } from "../exceptions";
+import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, Round as ExternalRound, GameStructure, StartGameRequestContent, DescribeGameResponseContent, CurrentPlayerRoundState, PlayerGuess as ExternalPlayerGuess, SubmitGameGuessRequestContent, SubmitGameGuessResponseContent } from "murdle-control-plane-client";
 import { AuthInfo } from "./auth";
 import { getWordleId, getWordleWord } from "../util/wordle";
 import { convertUserItemToExternal } from "../util/converter";
@@ -44,6 +44,58 @@ export class GameController {
     }
     res.send({
       game: this.convertGameItemToExternal(authenticatedUser.UserId, gameItem),
+    });
+  }
+
+  public async submitGameGuess(gameId: string, body: SubmitGameGuessRequestContent, res: Response<SubmitGameGuessResponseContent, AuthInfo>) {
+    const guess = body.guess.toLowerCase();
+    const authenticatedUser = res.locals.authenticatedUser;
+    const gameItem = await this.gameDAL.getGameById(gameId);
+    if (gameItem == undefined) {
+      throw new ResourceNotFoundException('Game not found');
+    }
+    const playerIds = gameItem.PlayerScores.map(player => player.Player.UserId);
+    const userIndex = GameDAL.findUserIndexInGame(gameItem, authenticatedUser.UserId);
+    if (userIndex == undefined) {
+      console.log(`User ${authenticatedUser.UserId} is not part of ${playerIds.toString()}`);
+      throw new AccessDeniedException('User not part of game');
+    }
+    if (body.roundNumber > gameItem.Rounds.length) {
+      throw new ResourceNotFoundException('Round not found');
+    }
+    const roundIndex = body.roundNumber - 1;
+    const playerRoundState = gameItem.PlayerScores[userIndex].PlayerRoundStates[roundIndex];
+    if (playerRoundState.PlayerGuesses.length >= 5) {
+      throw new ValidationException('Cannot add any more guesses');
+    }
+
+    var responseGameItem: GameItem | undefined = await this.gameDAL.addPlayerGuess({
+      gameId,
+      userId: authenticatedUser.UserId,
+      roundNumber: body.roundNumber,
+      playerGuess: {
+        Guess: guess,
+      }
+    });
+    if (responseGameItem == undefined) {
+      throw new ResourceNotFoundException('Game not found');
+    }
+
+    const playerScore = gameItem.PlayerScores[userIndex].Score;
+    const round = gameItem.Rounds[roundIndex];
+    if (round.WordleWord.toLowerCase() == guess) {
+      responseGameItem = await this.gameDAL.updatePlayerScore({
+        gameId,
+        userId: authenticatedUser.UserId,
+        newScore: playerScore + 10, // TODO: Add actual scoring
+      });
+      if (responseGameItem == undefined) {
+        throw new ResourceNotFoundException('Game not found');
+      }
+    }
+
+    res.send({
+      game: this.convertGameItemToExternal(authenticatedUser.UserId, responseGameItem),
     });
   }
 

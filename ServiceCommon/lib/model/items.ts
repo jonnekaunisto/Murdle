@@ -46,12 +46,6 @@ export interface Round {
   WordleWord: string,
 }
 
-export type LetterStatus = 'ABSENT' | 'CORRECT' | 'PRESENT';
-export interface GuessedLetterResult {
-  Letter: string,
-  LetterStatus: LetterStatus,
-}
-
 export interface PlayerGuess {
   Guess: string,
 }
