@@ -1,7 +1,7 @@
 import { DynamoDBDocument, GetCommandOutput } from "@aws-sdk/lib-dynamodb";
 import { LobbyDAL } from "..";
 import { gameRounds, gameWaitTimeSeconds, roundDurationSeconds } from "../game/gameRules";
-import { GameItem, PlayerGuess, PlayerRoundState, PlayerScore, PublicUser, Round } from "../model/items";
+import { GameItem, PlayerRoundState, PlayerScore, PublicUser, Round } from "../model/items";
 
 export interface CreateGameOptions {
   lobbyId: string,
@@ -14,7 +14,7 @@ export interface AddPlayerGuessOptions {
   gameId: string,
   userId: string,
   roundNumber: number,
-  playerGuess: PlayerGuess,
+  playerGuess: string,
 }
 
 export interface UpdatePlayerScoreOptions {

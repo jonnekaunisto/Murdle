@@ -1,11 +1,11 @@
 import { Response } from "express";
-import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round, PlayerGuess } from "murdle-service-common";
+import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round } from "murdle-service-common";
 import { AccessDeniedException, ResourceNotFoundException, ValidationException } from "../exceptions";
 import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, Round as ExternalRound, GameStructure, StartGameRequestContent, DescribeGameResponseContent, CurrentPlayerRoundState, PlayerGuess as ExternalPlayerGuess, SubmitGameGuessRequestContent, SubmitGameGuessResponseContent } from "murdle-control-plane-client";
 import { AuthInfo } from "./auth";
 import { getWordleId, getWordleWord } from "../util/wordle";
 import { convertUserItemToExternal } from "../util/converter";
-import { calculateMatchingLetters } from "../util/gameLogic";
+import { calculateMatchingLetters, calculatePoints } from "../util/gameLogic";
 
 export class GameController {
   public constructor(private readonly gameDAL: GameDAL, private readonly lobbyDAL: LobbyDAL) { }
@@ -60,38 +60,50 @@ export class GameController {
       console.log(`User ${authenticatedUser.UserId} is not part of ${playerIds.toString()}`);
       throw new AccessDeniedException('User not part of game');
     }
+
     if (body.roundNumber > gameItem.Rounds.length) {
       throw new ResourceNotFoundException('Round not found');
     }
+
     const roundIndex = body.roundNumber - 1;
     const playerRoundState = gameItem.PlayerScores[userIndex].PlayerRoundStates[roundIndex];
     if (playerRoundState.PlayerGuesses.length >= 5) {
       throw new ValidationException('Cannot add any more guesses');
     }
 
+    const round = gameItem.Rounds[roundIndex];
+    const solution = round.WordleWord.toLowerCase();
+    const lastGuess = playerRoundState.PlayerGuesses[playerRoundState.PlayerGuesses.length -1];
+    if (lastGuess == solution) {
+      throw new ValidationException('Game round is already won');
+    }
+
+    const currentUnixTime = new Date().getTime();
+    if (currentUnixTime > round.EndTime || currentUnixTime < round.StartTime) {
+      throw new ValidationException('Game is not in progress');
+    }
+
     var responseGameItem: GameItem | undefined = await this.gameDAL.addPlayerGuess({
       gameId,
       userId: authenticatedUser.UserId,
       roundNumber: body.roundNumber,
-      playerGuess: {
-        Guess: guess,
-      }
+      playerGuess: guess,
     });
     if (responseGameItem == undefined) {
       throw new ResourceNotFoundException('Game not found');
     }
 
     const playerScore = gameItem.PlayerScores[userIndex].Score;
-    const round = gameItem.Rounds[roundIndex];
     if (round.WordleWord.toLowerCase() == guess) {
       responseGameItem = await this.gameDAL.updatePlayerScore({
         gameId,
         userId: authenticatedUser.UserId,
-        newScore: playerScore + 10, // TODO: Add actual scoring
+        newScore: playerScore + calculatePoints(playerRoundState, round),
       });
       if (responseGameItem == undefined) {
         throw new ResourceNotFoundException('Game not found');
       }
+      // TODO end round if the last person to complete
     }
 
     res.send({
@@ -124,10 +136,10 @@ export class GameController {
     })
   }
 
-  private convertPlayerRoundStateToExternal(playerGuess: PlayerGuess, solution: string): ExternalPlayerGuess {
+  private convertPlayerRoundStateToExternal(playerGuess: string, solution: string): ExternalPlayerGuess {
     return {
-      guessedWord: playerGuess.Guess,
-      guessLetterResult: calculateMatchingLetters(solution, playerGuess.Guess),
+      guessedWord: playerGuess,
+      guessLetterResult: calculateMatchingLetters(solution, playerGuess),
     };
   }
 

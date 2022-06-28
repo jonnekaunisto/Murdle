@@ -46,12 +46,8 @@ export interface Round {
   WordleWord: string,
 }
 
-export interface PlayerGuess {
-  Guess: string,
-}
-
 export interface PlayerRoundState {
-  PlayerGuesses: PlayerGuess[],
+  PlayerGuesses: string[],
 }
 
 export interface PlayerGameState {

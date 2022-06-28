@@ -1,7 +1,7 @@
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { getDefaultTranslateConfig } from '../lib/dal/config';
-import { GameItem, LobbyItem, PlayerGuess, PublicUser } from '../lib';
+import { GameItem, LobbyItem, PublicUser } from '../lib';
 import { LobbyDAL } from "../lib/dal/lobbyDAL";
 import { GameDAL } from "../lib/dal/gameDAL";
 
@@ -98,9 +98,7 @@ const testGame: GameItem = {
   }
 }
 
-const testPlayerGuess: PlayerGuess = {
-  Guess: 'crate',
-}
+const testPlayerGuess = 'crate';
 
 const ddb = DynamoDBDocument.from(
   new DynamoDBClient({

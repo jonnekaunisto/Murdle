@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UsersController } from './controllers/users';
-import { CreateLobbyResponseContent, CreateUserRequestContent, CreateUserResponseContent, DescribeGameResponseContent, JoinLobbyResponseContent, LeaveLobbyResponseContent, StartGameRequestContent, StartGameResponseContent, UpdateUserRequestContent, UpdateUserResponseContent } from "murdle-control-plane-client";
+import { CreateLobbyResponseContent, CreateUserRequestContent, CreateUserResponseContent, DescribeGameResponseContent, JoinLobbyResponseContent, LeaveLobbyResponseContent, StartGameRequestContent, StartGameResponseContent, SubmitGameGuessRequestContent, SubmitGameGuessResponseContent, UpdateUserRequestContent, UpdateUserResponseContent } from "murdle-control-plane-client";
 import { BaseException } from './exceptions';
 import { AuthController, AuthInfo } from './controllers/auth';
 import { LobbyController } from './controllers/lobby';
@@ -83,6 +83,11 @@ export function createApp(usersController: UsersController,
   // Describe Game
   app.get('/v1/game/:gameId', (req: Request<{ gameId: string }>, res: Response<DescribeGameResponseContent, AuthInfo>, next) => {
     gameController.describeGame(req.params.gameId, res).catch(next);
+  });
+
+  // Submit Game Guess
+  app.get('/v1/game/:gameId/guess', (req: Request<{ gameId: string }, {}, SubmitGameGuessRequestContent>, res: Response<SubmitGameGuessResponseContent, AuthInfo>, next) => {
+    gameController.submitGameGuess(req.params.gameId, req.body, res).catch(next);
   });
 
   app.use(function (err, req, res: Response, next) {
