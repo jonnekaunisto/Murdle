@@ -7,10 +7,6 @@ import { FormButton } from '../modules/common/Buttons';
 export default {
   title: 'Component/Button',
   component: FormButton,
-  // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
-  argTypes: {
-    backgroundColor: { control: 'color' },
-  },
 } as ComponentMeta<typeof FormButton>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
