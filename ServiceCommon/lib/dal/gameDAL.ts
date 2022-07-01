@@ -85,7 +85,7 @@ export class GameDAL {
     }
     const roundIndex = options.roundNumber - 1;
 
-    const attributeLocation = `#ps[${roundIndex}].#prs[${roundIndex}].#pg`;
+    const attributeLocation = `#ps[${userIndex}].#prs[${roundIndex}].#pg`;
     
     return this.ddbDocClient.update({
       TableName: GameDAL.GAME_TABLE_NAME,
@@ -103,6 +103,7 @@ export class GameDAL {
     }).then(response => {
       return response.Attributes as GameItem | undefined;
     }).catch(error => {
+      console.log(attributeLocation);
       console.error(error);
       throw Error("Failed to Add To Guesses");
     });

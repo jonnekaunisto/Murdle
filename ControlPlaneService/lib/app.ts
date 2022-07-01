@@ -86,7 +86,7 @@ export function createApp(usersController: UsersController,
   });
 
   // Submit Game Guess
-  app.get('/v1/game/:gameId/guess', (req: Request<{ gameId: string }, {}, SubmitGameGuessRequestContent>, res: Response<SubmitGameGuessResponseContent, AuthInfo>, next) => {
+  app.post('/v1/game/:gameId/guess', (req: Request<{ gameId: string }, {}, SubmitGameGuessRequestContent>, res: Response<SubmitGameGuessResponseContent, AuthInfo>, next) => {
     gameController.submitGameGuess(req.params.gameId, req.body, res).catch(next);
   });
 
