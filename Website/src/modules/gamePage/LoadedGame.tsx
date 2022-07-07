@@ -1,5 +1,5 @@
-import { GameStructure } from "murdle-control-plane-client";
-import { useEffect, useReducer, useState } from "react";
+import { DefaultApi, GameStructure } from "murdle-control-plane-client";
+import { Dispatch, SetStateAction, useEffect, useReducer, useState } from "react";
 import { AlertContainer } from "../wordleComponents/alerts/AlertContainer";
 import {
   AlertProvider,
@@ -9,43 +9,50 @@ import { CountDown } from "./CountDown";
 import { GameComplete } from "./GameComplete";
 import { GameIO } from "./GameIO";
 import { GameRoundCompleted } from "./GameRoundCompleted";
-import { calculateInitialState, gameStateReducer } from "./gameState";
+import { recalculate, gameStateReducer } from "./gameState";
 import { GameWaiting } from "./GameWaiting";
 
-export const LoadedGame: React.FC<{ game: GameStructure }> = ({ game }) => {
+export const LoadedGame: React.FC<{ initialGame: GameStructure, murdleClient: DefaultApi }> = ({ initialGame, murdleClient }) => {
+  const [game, setGame] = useState(initialGame);
   const [gameState, gameStateDispatch] = useReducer(
     gameStateReducer,
-    calculateInitialState(game)
+    recalculate(game)
   );
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
     useAlert();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
-  const [guesses, setGuesses] = useState<string[]>([]);
 
-  function onValidGuess(currentGuess: string) {
-    guesses.push(currentGuess);
-    setGuesses(guesses);
-    if (currentGuess == gameState.currentRound.wordleWord?.toUpperCase()!) {
-      gameStateDispatch({
-        game: game,
-        type: "won",
-      });
-    } else if (guesses.length == 5) {
-      gameStateDispatch({
-        game: game,
-        type: "lost",
-      });
+
+  async function onValidGuess(currentGuess: string): Promise<undefined> {
+    // TODO: Handle 4xx error
+    // Example: When we guessed too many times already
+    const guessResult = await murdleClient.submitGameGuess(game.gameId, {
+      guess: currentGuess,
+      roundNumber: gameState.currentRoundIndex + 1,
+    });
+
+    if (guessResult.game == undefined) {
+     throw new Error("Game undefined");
     }
+    setGame(guessResult.game);
+
+    gameStateDispatch({
+      game: guessResult.game,
+      type: "recalculate",
+    });
+
+    return undefined;
   }
 
   useEffect(function () {
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       gameStateDispatch({
-        game: game,
+        game,
         type: "recalculate",
       });
     }, 1000);
-  }, []);
+    return () => clearInterval(intervalId);
+  }, [game]);
 
   if (gameState.gameStatus == "complete") {
     return <GameComplete game={game}></GameComplete>;
@@ -101,7 +108,7 @@ export const LoadedGame: React.FC<{ game: GameStructure }> = ({ game }) => {
           )}
           <GameIO
             solution={gameState.currentRound.wordleWord!.toUpperCase()}
-            guesses={guesses}
+            guesses={gameState.currentRoundGuesses}
             onValidGuess={onValidGuess}
           ></GameIO>
           <AlertContainer />

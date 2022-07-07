@@ -22,17 +22,18 @@ export const GameIO: React.FC<{
     setCurrentGuess(currentGuess.substring(0, currentGuess.length - 1));
   }
 
-  function onEnter() {
+  async function onEnter() {
     if (currentGuess.length == 5 && isWordleWord(currentGuess)) {
-      onValidGuess(currentGuess);
-
+      await onValidGuess(currentGuess);
       setCurrentGuess("");
       setIsRevealing(true);
+
       // turn this back off after all
       // chars have been revealed
       setTimeout(() => {
         setIsRevealing(false);
-      }, 2000 * 5);
+      // TODO: Set in constant
+      }, 350 * 5);
     } else {
       setCurrentRowClass("jiggle");
 

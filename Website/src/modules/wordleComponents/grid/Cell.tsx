@@ -19,7 +19,7 @@ export const Cell = ({
 }: Props) => {
   const isFilled = value && !isCompleted
   const shouldReveal = isRevealing && isCompleted
-  const animationDelay = `${position * 1}ms`
+  const animationDelay = `${position * 350}ms`
   const isHighContrast = false;
 
   const classes = classnames(
@@ -29,15 +29,15 @@ export const Cell = ({
         !status,
       'border-black dark:border-slate-100': value && !status,
       'absent shadowed bg-slate-400 dark:bg-slate-700 text-white border-slate-400 dark:border-slate-700':
-        status === 'absent',
+        status === 'ABSENT',
       'correct shadowed bg-orange-500 text-white border-orange-500':
-        status === 'correct' && isHighContrast,
+        status === 'CORRECT' && isHighContrast,
       'present shadowed bg-cyan-500 text-white border-cyan-500':
-        status === 'present' && isHighContrast,
+        status === 'PRESENT' && isHighContrast,
       'correct shadowed bg-green-500 text-white border-green-500':
-        status === 'correct' && !isHighContrast,
+        status === 'CORRECT' && !isHighContrast,
       'present shadowed bg-yellow-500 text-white border-yellow-500':
-        status === 'present' && !isHighContrast,
+        status === 'PRESENT' && !isHighContrast,
       'cell-fill-animation': isFilled,
       'cell-reveal': shouldReveal,
     }

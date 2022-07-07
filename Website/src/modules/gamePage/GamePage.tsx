@@ -1,4 +1,4 @@
-import { GameStructure } from "murdle-control-plane-client";
+import { DefaultApi, GameStructure } from "murdle-control-plane-client";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { LocalUserDAL } from "../../util/localUserDAL";
@@ -10,6 +10,7 @@ export const GamePage: React.FC = () => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [game, setGame] = useState<GameStructure | undefined>(undefined);
+  const [murdleClient, setMurdleClient] = useState<DefaultApi | undefined>(undefined);
 
   useEffect(
     function () {
@@ -28,9 +29,10 @@ export const GamePage: React.FC = () => {
         return;
       }
 
-      const murdleClient = createClient(user.authToken);
+      const client = createClient(user.authToken)
+      setMurdleClient(client);
 
-      murdleClient
+      client
         .describeGame(parsedGameId)
         .then((result) => {
           setGame(result.game);
@@ -42,9 +44,9 @@ export const GamePage: React.FC = () => {
     [router.isReady]
   );
 
-  if (game == undefined) {
+  if (game == undefined || murdleClient == undefined) {
     return <Loading errorMessage={errorMessage}></Loading>;
   }
 
-  return <LoadedGame game={game}></LoadedGame>
+  return <LoadedGame initialGame={game} murdleClient={murdleClient}></LoadedGame>
 };

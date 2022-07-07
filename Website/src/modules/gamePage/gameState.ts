@@ -1,4 +1,5 @@
 import { GameStructure, PlayerScore, Round } from "murdle-control-plane-client";
+import { LetterStatus } from "../wordleComponents/common/util";
 
 export type RoundStatus = 'won' | 'lost' | 'in_progress' | 'waiting';
 export type GameStatus = 'complete' | 'in_progress';
@@ -9,6 +10,10 @@ export interface GameAction {
   readonly type: GameActionType,
 }
 
+export interface CurrentRoundGuessResult {
+  guessedLetterStatus: LetterStatus[],
+}
+
 export interface GameState {
   readonly currentRound: Round;
   readonly lastRound?: Round;
@@ -16,28 +21,8 @@ export interface GameState {
   readonly roundStatus: RoundStatus;
   readonly gameStatus: GameStatus;
   readonly playerScores: PlayerScore[];
-}
-
-export function calculateInitialState(game: GameStructure): GameState {
-
-  const { round: currentRound, index: currentRoundIndex } = getCurrentRound(game);
-
-  var lastRound: Round | undefined;
-  if (currentRoundIndex > 0) {
-    lastRound = game.rounds[currentRoundIndex -1];
-  }
-
-  const roundStatus = getCurrentRoundStatus(currentRound);
-  const gameStatus = getGameStatus(game);
-
-  return {
-    currentRound,
-    lastRound,
-    currentRoundIndex,
-    roundStatus,
-    gameStatus,
-    playerScores: sortPlayerScores(game.playerScores),
-  }
+  readonly currentRoundGuesses: string[],
+  readonly currentRoundGuessResults: CurrentRoundGuessResult[],
 }
 
 function sortPlayerScores(playerScores: PlayerScore[]): PlayerScore[] {
@@ -52,7 +37,7 @@ function sortPlayerScores(playerScores: PlayerScore[]): PlayerScore[] {
   })
 }
 
-function recalculate(game: GameStructure, gameState: GameState): GameState {
+export function recalculate(game: GameStructure): GameState {
   const { round: currentRound, index: currentRoundIndex } = getCurrentRound(game);
 
   var lastRound: Round | undefined;
@@ -60,9 +45,10 @@ function recalculate(game: GameStructure, gameState: GameState): GameState {
     lastRound = game.rounds[currentRoundIndex -1];
   }
 
-  const roundStatus = gameState.currentRoundIndex == currentRoundIndex ? 
-    getCurrentRoundStatus(currentRound, gameState.roundStatus) : getCurrentRoundStatus(currentRound);
+  const roundStatus = getCurrentRoundStatus(currentRound, currentRoundIndex, game);
   const gameStatus = getGameStatus(game);
+
+  const currentRoundGuesses = getCurrentRoundGuesses(game, currentRoundIndex);
 
   return {
     currentRound,
@@ -71,18 +57,48 @@ function recalculate(game: GameStructure, gameState: GameState): GameState {
     roundStatus,
     gameStatus,
     playerScores: sortPlayerScores(game.playerScores),
+    currentRoundGuesses,
+    currentRoundGuessResults: getCurrentRoundGuessResults(game, currentRoundIndex),
   }
 }
 
-function getCurrentRoundStatus(round: Round, currentRoundStatus?: RoundStatus): RoundStatus {
+function getCurrentRoundStatus(round: Round, roundIndex: number, game: GameStructure): RoundStatus {
+  const guesses = game.currentPlayerRoundStates[roundIndex].playerGuesses;
+  // Check if round is lost
+  if (guesses.length == 5) {
+    const wrongLetters = 
+      guesses[4].guessLetterResult.filter(result => result.status != 'CORRECT');
+    if (wrongLetters.length > 0) {
+      return 'lost';
+    }
+  }
+
+  // Check if round is won
+  const rightGuesses = guesses.filter(guess => {
+    const rightLetters = guess.guessLetterResult.filter(result => result.status == 'CORRECT');
+    return rightLetters.length == 5;
+  });
+  if (rightGuesses.length > 0) {
+    return 'won';
+  }
+
+  // Check if round is in progress
   const currentTime = Date.now();
   if (round.startTime > currentTime) {
     return 'waiting';
-  } else if (currentRoundStatus == 'lost' || currentRoundStatus == 'won') {
-    return currentRoundStatus;
-  } else {
+  }
+  else {
     return 'in_progress';
   }
+}
+
+function getCurrentRoundGuessResults(game: GameStructure, roundIndex: number): CurrentRoundGuessResult[] {
+  return game.currentPlayerRoundStates[roundIndex].playerGuesses.map(guess => {
+      const roundResult: CurrentRoundGuessResult = {
+        guessedLetterStatus: guess.guessLetterResult.map(result => result.status)
+      }
+      return roundResult;
+  });
 }
 
 function getGameStatus(game: GameStructure): GameStatus {
@@ -121,29 +137,16 @@ function getCurrentRound(game: GameStructure): { round: Round, index: number } {
   }
 }
 
-function lost(gameState: GameState): GameState {
-  return {
-    ...gameState,
-    roundStatus: 'lost',
-  }
-}
-
-function won(gameState: GameState): GameState {
-  return {
-    ...gameState,
-    roundStatus: 'won',
-  }
+function getCurrentRoundGuesses(game: GameStructure, currentRoundIndex: number) {
+  const playerGuesses = game.currentPlayerRoundStates[currentRoundIndex].playerGuesses;
+  return playerGuesses.map(guess => guess.guessedWord.toUpperCase());
 }
 
 export function gameStateReducer(state: GameState, action: GameAction) {
   switch (action.type) {
     case 'recalculate':
-      return recalculate(action.game, state);
-    case 'won':
-      return won(state);
-    case 'lost':
-      return lost(state);
+      return recalculate(action.game);
     default:
-      throw new Error();
+      throw new Error("Action not found");
   }
 }
