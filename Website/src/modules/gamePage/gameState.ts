@@ -37,6 +37,11 @@ function sortPlayerScores(playerScores: PlayerScore[]): PlayerScore[] {
   })
 }
 
+export function shouldRecalculate(game: GameStructure, currentGameState: GameState) {
+  const newGameState = recalculate(game);
+  return JSON.stringify(newGameState) !== JSON.stringify(currentGameState)
+}
+
 export function recalculate(game: GameStructure): GameState {
   const { round: currentRound, index: currentRoundIndex } = getCurrentRound(game);
 

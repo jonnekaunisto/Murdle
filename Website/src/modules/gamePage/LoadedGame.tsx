@@ -1,5 +1,9 @@
 import { DefaultApi, GameStructure } from "murdle-control-plane-client";
-import { Dispatch, SetStateAction, useEffect, useReducer, useState } from "react";
+import {
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import { AlertContainer } from "../wordleComponents/alerts/AlertContainer";
 import {
   AlertProvider,
@@ -9,10 +13,13 @@ import { CountDown } from "./CountDown";
 import { GameComplete } from "./GameComplete";
 import { GameIO } from "./GameIO";
 import { GameRoundCompleted } from "./GameRoundCompleted";
-import { recalculate, gameStateReducer } from "./gameState";
+import { recalculate, gameStateReducer, shouldRecalculate } from "./gameState";
 import { GameWaiting } from "./GameWaiting";
 
-export const LoadedGame: React.FC<{ initialGame: GameStructure, murdleClient: DefaultApi }> = ({ initialGame, murdleClient }) => {
+export const LoadedGame: React.FC<{
+  initialGame: GameStructure;
+  murdleClient: DefaultApi;
+}> = ({ initialGame, murdleClient }) => {
   const [game, setGame] = useState(initialGame);
   const [gameState, gameStateDispatch] = useReducer(
     gameStateReducer,
@@ -21,7 +28,6 @@ export const LoadedGame: React.FC<{ initialGame: GameStructure, murdleClient: De
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
     useAlert();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
-
 
   async function onValidGuess(currentGuess: string): Promise<undefined> {
     // TODO: Handle 4xx error
@@ -32,7 +38,7 @@ export const LoadedGame: React.FC<{ initialGame: GameStructure, murdleClient: De
     });
 
     if (guessResult.game == undefined) {
-     throw new Error("Game undefined");
+      throw new Error("Game undefined");
     }
     setGame(guessResult.game);
 
@@ -44,15 +50,49 @@ export const LoadedGame: React.FC<{ initialGame: GameStructure, murdleClient: De
     return undefined;
   }
 
-  useEffect(function () {
-    const intervalId = setInterval(() => {
-      gameStateDispatch({
-        game,
-        type: "recalculate",
-      });
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, [game]);
+  // Poll the game to see if round ended prematurely
+  useEffect(
+    function () {
+      if (gameState.gameStatus == "complete") {
+        return;
+      }
+
+      const intervalId = setInterval(() => {
+        murdleClient
+          .describeGame(game.gameId)
+          .then((result) => {
+            const fetchedGame = result.game;
+            setGame(fetchedGame);
+
+            gameStateDispatch({
+              game: fetchedGame,
+              type: "recalculate",
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }, 7000);
+      return () => clearInterval(intervalId);
+    },
+    [game]
+  );
+
+  // Recompute values when round changes
+  useEffect(
+    function () {
+      const intervalId = setInterval(() => {
+        if (shouldRecalculate(game, gameState)) {
+          gameStateDispatch({
+            game,
+            type: "recalculate",
+          });
+        }
+      }, 1000);
+      return () => clearInterval(intervalId);
+    },
+    [game]
+  );
 
   if (gameState.gameStatus == "complete") {
     return <GameComplete game={game}></GameComplete>;
@@ -69,7 +109,11 @@ export const LoadedGame: React.FC<{ initialGame: GameStructure, murdleClient: De
 
   if (gameState.roundStatus == "waiting") {
     return (
-      <GameWaiting startTime={gameState.currentRound.startTime} lastRound={gameState.lastRound} playerScores={gameState.playerScores}></GameWaiting>
+      <GameWaiting
+        startTime={gameState.currentRound.startTime}
+        lastRound={gameState.lastRound}
+        playerScores={gameState.playerScores}
+      ></GameWaiting>
     );
   }
 
