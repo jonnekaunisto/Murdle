@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round } from "murdle-service-common";
+import { GameDAL, gameRounds, GameItem, PlayerScore, LobbyDAL, Round, PlayerRoundState } from "murdle-service-common";
 import { AccessDeniedException, ResourceNotFoundException, ValidationException } from "../exceptions";
 import { StartGameResponseContent, PlayerScore as ExternalPlayerScore, Round as ExternalRound, GameStructure, StartGameRequestContent, DescribeGameResponseContent, CurrentPlayerRoundState, PlayerGuess as ExternalPlayerGuess, SubmitGameGuessRequestContent, SubmitGameGuessResponseContent } from "murdle-control-plane-client";
 import { AuthInfo } from "./auth";
@@ -93,6 +93,7 @@ export class GameController {
       throw new ResourceNotFoundException('Game not found');
     }
 
+    // Check if the user got the word right
     const playerScore = gameItem.PlayerScores[userIndex].Score;
     if (round.WordleWord.toLowerCase() == guess) {
       responseGameItem = await this.gameDAL.updatePlayerScore({
@@ -103,7 +104,17 @@ export class GameController {
       if (responseGameItem == undefined) {
         throw new ResourceNotFoundException('Game not found');
       }
-      // TODO end round if the last person to complete
+    }
+
+    // End round if this is the last player to complete
+    if (this.isRoundComplete(responseGameItem, roundIndex)) {
+      responseGameItem = await this.gameDAL.endGameRound({
+        gameId,
+        roundNumber: body.roundNumber,
+      });
+      if (responseGameItem == undefined) {
+        throw new ResourceNotFoundException('Game not found');
+      }
     }
 
     res.send({
@@ -159,5 +170,20 @@ export class GameController {
       score: playerScore.Score,
       totalTime: playerScore.TotalTime,
     }
+  }
+
+  private isRoundComplete(game: GameItem, roundIndex: number): boolean {
+    const correctWord = game.Rounds[roundIndex].WordleWord;
+    const incompletePlayers = game.PlayerScores.filter(score => !this.isUserRoundComplete(score.PlayerRoundStates[roundIndex], correctWord));
+    return incompletePlayers.length == 0;
+  }
+
+  private isUserRoundComplete(userRound: PlayerRoundState, correctWord: string): boolean {
+    if (userRound.PlayerGuesses.length == 5) {
+      return true;
+    }
+
+    const correctGuesses = userRound.PlayerGuesses.filter(guess => guess.toLowerCase() == correctWord.toLowerCase());
+    return correctGuesses.length != 0;
   }
 }

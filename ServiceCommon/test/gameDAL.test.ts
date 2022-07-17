@@ -123,6 +123,7 @@ describe('End to End', () => {
     jest.useRealTimers()
   });
   test('CRUD', async () => {
+    const currentUnixTime = new Date().getTime();
     // Create Game
     const initialGame = await gameDAL.createGame({
       lobbyId: testLobby.LobbyId,
@@ -169,5 +170,14 @@ describe('End to End', () => {
     });
     testGame.PlayerScores[0].PlayerRoundStates[0].PlayerGuesses.push(testPlayerGuess);
     expect(gameWithPlayerGuess).toEqual(testGame);
+
+    const endedGame = await gameDAL.endGameRound({
+      gameId: testGame.GameId,
+      roundNumber: 1,
+    });
+    testGame.Rounds[1].StartTime = testGame.Rounds[0].StartTime;
+    testGame.Rounds[1].EndTime = testGame.Rounds[0].EndTime;
+    testGame.Rounds[0].EndTime = currentUnixTime;
+    expect(endedGame).toEqual(testGame);
   });
 });

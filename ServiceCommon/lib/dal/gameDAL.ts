@@ -23,6 +23,11 @@ export interface UpdatePlayerScoreOptions {
   newScore: number;
 }
 
+export interface EndGameRoundOptions {
+  gameId: string,
+  roundNumber: number,
+}
+
 export class GameDAL {
   private static readonly GAME_TABLE_NAME: string = "MurdleGame";
   public constructor(private readonly ddbDocClient: DynamoDBDocument, private readonly lobbyDAL: LobbyDAL) { }
@@ -135,6 +140,54 @@ export class GameDAL {
     }).catch(error => {
       console.error(error);
       throw Error("Failed to Update Score");
+    });
+  }
+
+  public async endGameRound(options: EndGameRoundOptions) {
+    const gameItem = await this.getGameById(options.gameId);
+    if (gameItem == undefined) {
+      return undefined;
+    }
+    const currentUnixTime = new Date().getTime();
+
+    const round = gameItem.Rounds[options.roundNumber - 1];
+    const leftOverTime = round.EndTime - currentUnixTime;
+    if (leftOverTime <= 0) {
+      return gameItem;
+    }
+    var updateExpression = `SET Rounds[${options.roundNumber - 1}].EndTime = :currEndTime,`
+    var expressionAttributeValues = {
+      ':currEndTime': currentUnixTime,
+    }
+
+    gameItem.Rounds.forEach((round, index) => {
+      if (index <= options.roundNumber - 1) {
+        return;
+      }
+      const startValueName = `:StartTime${index}`;
+      const endValueName = `:EndTime${index}`;
+      updateExpression += `Rounds[${index}].StartTime = ${startValueName},`;
+      updateExpression += `Rounds[${index}].EndTime = ${endValueName},`;
+      expressionAttributeValues[startValueName] = round.StartTime - leftOverTime;
+      expressionAttributeValues[endValueName] = round.EndTime - leftOverTime;
+    });
+
+    // Take out the redundant comma
+    updateExpression = updateExpression.slice(0, -1);
+
+    return this.ddbDocClient.update({
+      TableName: GameDAL.GAME_TABLE_NAME,
+      Key: {
+        GameId: options.gameId,
+      },
+      UpdateExpression: updateExpression,
+      ExpressionAttributeValues: expressionAttributeValues,
+      ReturnValues: 'ALL_NEW',
+    }).then(response => {
+      return response.Attributes as GameItem | undefined;
+    }).catch(error => {
+      console.error(error);
+      throw Error("Failed to End Round");
     });
   }
 

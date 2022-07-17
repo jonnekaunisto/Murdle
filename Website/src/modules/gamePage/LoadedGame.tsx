@@ -91,7 +91,7 @@ export const LoadedGame: React.FC<{
       }, 1000);
       return () => clearInterval(intervalId);
     },
-    [game]
+    [game, gameState]
   );
 
   if (gameState.gameStatus == "complete") {
